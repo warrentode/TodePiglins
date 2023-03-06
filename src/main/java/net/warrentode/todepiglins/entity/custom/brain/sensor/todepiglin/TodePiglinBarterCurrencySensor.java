@@ -11,6 +11,7 @@ import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.ai.sensing.SensorType;
+import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.Level;
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
 import net.warrentode.todepiglins.entity.custom.brain.memory.ModMemoryTypes;
 import net.warrentode.todepiglins.entity.custom.brain.sensor.ModSensorTypes;
+import net.warrentode.todepiglins.entity.custom.todepiglin.todepiglinmerchant.TodePiglinMerchantAi;
 import net.warrentode.todepiglins.util.ModTags;
 
 public class TodePiglinBarterCurrencySensor <E extends LivingEntity> extends ExtendedSensor<E> {
@@ -87,7 +89,11 @@ public class TodePiglinBarterCurrencySensor <E extends LivingEntity> extends Ext
     public static void isBarterCurrency() {
         ItemStack stack = ItemStack.EMPTY;
         if (stack.is(ModTags.Items.PIGLIN_BARTER_ITEMS)) {
-            stack.isPiglinCurrency();
+            stack.is(TodePiglinMerchantAi.BARTERING_ITEM);
+            stack.is(PiglinAi.BARTERING_ITEM);
+        } else if (stack.isPiglinCurrency()) {
+            stack.is(TodePiglinMerchantAi.BARTERING_ITEM);
+            stack.is(PiglinAi.BARTERING_ITEM);
         }
     }
 

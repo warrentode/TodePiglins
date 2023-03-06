@@ -28,6 +28,7 @@ import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.item.CrossbowItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
@@ -49,6 +50,7 @@ import net.warrentode.todepiglins.entity.custom.brain.manager.todepiglinmerchant
 import net.warrentode.todepiglins.entity.custom.brain.memory.ModMemoryTypes;
 import net.warrentode.todepiglins.entity.custom.brain.sensor.todepiglin.TodePiglinBarterCurrencySensor;
 import net.warrentode.todepiglins.entity.custom.todepiglin.TodeAbstractPiglin;
+import net.warrentode.todepiglins.util.ModTags;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -60,6 +62,7 @@ import java.util.Optional;
 public class TodePiglinMerchantAi {
     public static final int REPELLENT_DETECTION_RANGE_HORIZONTAL = 8;
     public static final int REPELLENT_DETECTION_RANGE_VERTICAL = 4;
+    public static final Item BARTERING_ITEM = ItemStack.EMPTY.getItem();
     private static final double PLAYER_ANGER_RANGE = 16.0D;
     private static final int ANGER_DURATION = 600;
     public static final int ADMIRE_DURATION = 120;
@@ -260,7 +263,7 @@ public class TodePiglinMerchantAi {
     }
 
 
-    /** this is where the barter recipe check begins **/
+    /** this is where the "barter recipe" check begins **/
     protected static void pickUpItem(TodePiglinMerchant todePiglinMerchant, @NotNull ItemEntity itemEntity) {
         stopWalking(todePiglinMerchant);
         ItemStack itemstack;
@@ -295,7 +298,7 @@ public class TodePiglinMerchantAi {
         todePiglinMerchant.holdInOffHand(stack);
     }
 
-    private static ItemStack removeOneItemFromItemEntity(ItemEntity itemEntity) {
+    private static @NotNull ItemStack removeOneItemFromItemEntity(@NotNull ItemEntity itemEntity) {
         ItemStack stack = itemEntity.getItem();
         ItemStack stack1 = stack.split(1);
         if (stack.isEmpty()) {
@@ -306,11 +309,11 @@ public class TodePiglinMerchantAi {
         return stack1;
     }
 
-    public static void stopHoldingOffHandItem(TodePiglinMerchant todePiglinMerchant, boolean pShouldBarter) {
+    public static void stopHoldingOffHandItem(@NotNull TodePiglinMerchant todePiglinMerchant, boolean pShouldBarter) {
         ItemStack stack = todePiglinMerchant.getItemInHand(InteractionHand.OFF_HAND);
         todePiglinMerchant.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
         if (todePiglinMerchant.isAdult()) {
-            boolean flag = stack.isPiglinCurrency();
+            boolean flag = (stack.is(ModTags.Items.PIGLIN_BARTER_ITEMS) || stack.isPiglinCurrency());
             if (pShouldBarter && flag) {
                 //accepts the trade - happy emote here & and gives an item
                 //particle emote set in sensor
@@ -348,12 +351,12 @@ public class TodePiglinMerchantAi {
         }
     }
 
-    private static void putInMerchantInventory(TodePiglinMerchant todePiglinMerchant, ItemStack stack) {
+    private static void putInMerchantInventory(@NotNull TodePiglinMerchant todePiglinMerchant, ItemStack stack) {
         todePiglinMerchant.addToMerchantInventory(stack);
         throwItemsTowardRandomPos(todePiglinMerchant, Collections.singletonList(stack));
     }
 
-    private static void throwItems(TodePiglinMerchant todePiglinMerchant, List<ItemStack> stacks) {
+    private static void throwItems(@NotNull TodePiglinMerchant todePiglinMerchant, List<ItemStack> stacks) {
         Optional<Player> optional = todePiglinMerchant.getBrain().getMemory(MemoryModuleType.NEAREST_VISIBLE_PLAYER);
         if (optional.isPresent()) {
             throwItemsTowardPlayer(todePiglinMerchant, optional.get(), stacks);
@@ -366,11 +369,11 @@ public class TodePiglinMerchantAi {
         throwItemsTowardPos(todePiglinMerchant, stacks, getRandomNearbyPos(todePiglinMerchant));
     }
 
-    private static void throwItemsTowardPlayer(TodePiglinMerchant todePiglinMerchant, Player pPlayer, List<ItemStack> stacks) {
+    private static void throwItemsTowardPlayer(TodePiglinMerchant todePiglinMerchant, @NotNull Player pPlayer, List<ItemStack> stacks) {
         throwItemsTowardPos(todePiglinMerchant, stacks, pPlayer.position());
     }
 
-    private static void throwItemsTowardPos(TodePiglinMerchant todePiglinMerchant, List<ItemStack> stacks, Vec3 pPos) {
+    private static void throwItemsTowardPos(TodePiglinMerchant todePiglinMerchant, @NotNull List<ItemStack> stacks, Vec3 pPos) {
         if (!stacks.isEmpty()) {
             todePiglinMerchant.swing(InteractionHand.OFF_HAND);
             for(ItemStack itemstack : stacks) {
@@ -381,7 +384,7 @@ public class TodePiglinMerchantAi {
 
     /** if I can get the custom currency working then maybe I can then get custom loot tables running too
      * it's very likely that I can get this running with the sensor **/
-    private static List<ItemStack> getBarterResponseItems(TodePiglinMerchant todePiglinMerchant) {
+    private static @NotNull List<ItemStack> getBarterResponseItems(TodePiglinMerchant todePiglinMerchant) {
         //maybe dance?
         barterDance(todePiglinMerchant);
         LootTable lootTable = Objects.requireNonNull(todePiglinMerchant.level.getServer()).getLootTables().get(BuiltInLootTables.PIGLIN_BARTERING);
@@ -391,7 +394,7 @@ public class TodePiglinMerchantAi {
                 .withRandom(todePiglinMerchant.level.random).create(LootContextParamSets.PIGLIN_BARTER));
     }
 
-    private static void barterDance(TodePiglinMerchant todePiglinMerchant) {
+    private static void barterDance(@NotNull TodePiglinMerchant todePiglinMerchant) {
         float DanceChance;
         DanceChance = RandomSource.create(todePiglinMerchant.level.getGameTime()).nextFloat();
 
@@ -411,7 +414,7 @@ public class TodePiglinMerchantAi {
         }
     }
 
-    public static boolean wantsToDance(LivingEntity gameTime, LivingEntity livingEntity) {
+    public static boolean wantsToDance(LivingEntity gameTime, @NotNull LivingEntity livingEntity) {
         if (livingEntity.getType() != EntityType.HOGLIN) {
             return false;
         }
@@ -420,14 +423,14 @@ public class TodePiglinMerchantAi {
         }
     }
 
-    protected static boolean wantsToPickup(TodePiglinMerchant todePiglinMerchant, ItemStack stack) {
+    protected static boolean wantsToPickup(@NotNull TodePiglinMerchant todePiglinMerchant, ItemStack stack) {
         if (todePiglinMerchant.isBaby() && stack.is(ItemTags.IGNORED_BY_PIGLIN_BABIES)) {
             return false;
         } else if (stack.is(ItemTags.PIGLIN_REPELLENTS)) {
             return false;
         } else if (isAdmiringDisabled(todePiglinMerchant) && todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.ATTACK_TARGET)) {
             return false;
-        } else if (stack.isPiglinCurrency()) {
+        } else if (stack.is(ModTags.Items.PIGLIN_BARTER_ITEMS) || stack.isPiglinCurrency()) {
             return isNotHoldingLovedItemInOffHand(todePiglinMerchant);
         } else {
             boolean flag = todePiglinMerchant.canAddToMerchantInventory(stack);
@@ -443,7 +446,7 @@ public class TodePiglinMerchantAi {
         }
     }
 
-    public static boolean isLovedItem(ItemStack stack) {
+    public static boolean isLovedItem(@NotNull ItemStack stack) {
         return stack.is(ItemTags.PIGLIN_LOVED);
     }
 
@@ -461,7 +464,7 @@ public class TodePiglinMerchantAi {
     }
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
-    public static boolean isNearZombified(TodePiglinMerchant todePiglinMerchant) {
+    public static boolean isNearZombified(@NotNull TodePiglinMerchant todePiglinMerchant) {
         Brain<TodePiglinMerchant> todepiglinmerchantBrain = todePiglinMerchant.getBrain();
         if (todepiglinmerchantBrain.hasMemoryValue(MemoryModuleType.NEAREST_VISIBLE_ZOMBIFIED)) {
             LivingEntity livingentity = todepiglinmerchantBrain.getMemory(MemoryModuleType.NEAREST_VISIBLE_ZOMBIFIED).get();
@@ -471,7 +474,7 @@ public class TodePiglinMerchantAi {
         }
     }
 
-    private static Optional<? extends LivingEntity> findNearestValidAttackTarget(TodePiglinMerchant todePiglinMerchant) {
+    private static Optional<? extends LivingEntity> findNearestValidAttackTarget(@NotNull TodePiglinMerchant todePiglinMerchant) {
         Brain<TodePiglinMerchant> piglinMerchantBrain = todePiglinMerchant.getBrain();
         if (isNearZombified(todePiglinMerchant)) {
             return Optional.empty();
@@ -514,7 +517,7 @@ public class TodePiglinMerchantAi {
 
     /** this looks like where the piglin merchant entity can take a barter item or loved item from the player directly
      * possibly build a merchant trader screen and maybe make good use of the currency sensor with this **/
-    public static InteractionResult mobInteract(TodePiglinMerchant todePiglinMerchant, Player pPlayer, InteractionHand pHand) {
+    public static InteractionResult mobInteract(TodePiglinMerchant todePiglinMerchant, @NotNull Player pPlayer, InteractionHand pHand) {
         ItemStack itemstack = pPlayer.getItemInHand(pHand);
         if (canAdmire(todePiglinMerchant, itemstack)) {
             ItemStack itemstack1 = itemstack.split(1);
@@ -528,7 +531,8 @@ public class TodePiglinMerchantAi {
     }
 
     protected static boolean canAdmire(TodePiglinMerchant todePiglinMerchant, ItemStack stack) {
-        return !isAdmiringDisabled(todePiglinMerchant) && !isAdmiringItem(todePiglinMerchant) && stack.isPiglinCurrency();
+        return !isAdmiringDisabled(todePiglinMerchant) && !isAdmiringItem(todePiglinMerchant)
+                && (stack.is(ModTags.Items.PIGLIN_BARTER_ITEMS) || stack.isPiglinCurrency());
     }
 
     protected static void wasHurtBy(TodePiglinMerchant todePiglinMerchant, LivingEntity angerTarget) {
@@ -563,7 +567,7 @@ public class TodePiglinMerchantAi {
         }
     }
 
-    protected static void maybeRetaliate(TodePiglinMerchant todePiglinMerchant, LivingEntity angerTarget) {
+    protected static void maybeRetaliate(@NotNull TodePiglinMerchant todePiglinMerchant, LivingEntity angerTarget) {
         if (!todePiglinMerchant.getBrain().isActive(Activity.AVOID)) {
             if (Sensor.isEntityAttackableIgnoringLineOfSight(todePiglinMerchant, angerTarget)) {
                 if (!BehaviorUtils.isOtherTargetMuchFurtherAwayThanCurrentAttackTarget(todePiglinMerchant, angerTarget, 4.0D)) {
@@ -579,7 +583,7 @@ public class TodePiglinMerchantAi {
         }
     }
 
-    public static Optional<SoundEvent> getMerchantSoundForCurrentActivity(TodePiglinMerchant todePiglinMerchant) {
+    public static Optional<SoundEvent> getMerchantSoundForCurrentActivity(@NotNull TodePiglinMerchant todePiglinMerchant) {
         return todePiglinMerchant.getBrain().getActiveNonCoreActivity().map((activity) -> getSoundForMerchantActivity(todePiglinMerchant, activity));
     }
 
@@ -602,27 +606,27 @@ public class TodePiglinMerchantAi {
     }
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
-    private static boolean isNearAvoidTarget(TodePiglinMerchant todePiglinMerchant) {
+    private static boolean isNearAvoidTarget(@NotNull TodePiglinMerchant todePiglinMerchant) {
         Brain<TodePiglinMerchant> todePiglinMerchantBrain = todePiglinMerchant.getBrain();
         return todePiglinMerchantBrain.hasMemoryValue(MemoryModuleType.AVOID_TARGET) && 
                 todePiglinMerchantBrain.getMemory(MemoryModuleType.AVOID_TARGET).get().closerThan(todePiglinMerchant, 12.0D);
     }
 
-    public static boolean hasAnyoneNearbyHuntedRecently(TodePiglinMerchant todePiglinMerchant) {
+    public static boolean hasAnyoneNearbyHuntedRecently(@NotNull TodePiglinMerchant todePiglinMerchant) {
         return todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.HUNTED_RECENTLY) ||
                 getVisibleAdultPiglins(todePiglinMerchant).stream().anyMatch((brain) ->
                         todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.HUNTED_RECENTLY));
     }
 
-    private static List<TodeAbstractPiglin> getVisibleAdultPiglins(TodePiglinMerchant todePiglinMerchant) {
+    private static List<TodeAbstractPiglin> getVisibleAdultPiglins(@NotNull TodePiglinMerchant todePiglinMerchant) {
         return todePiglinMerchant.getBrain().getMemory(ModMemoryTypes.NEAREST_VISIBLE_ADULT_TODEPIGLINS.get()).orElse(ImmutableList.of());
     }
 
-    private static Optional<?> getAdultPiglins(TodeAbstractPiglin todeAbstractPiglin) {
+    private static @NotNull Optional<?> getAdultPiglins(@NotNull TodeAbstractPiglin todeAbstractPiglin) {
         return todeAbstractPiglin.getBrain().getMemory(ModMemoryTypes.NEAREST_VISIBLE_ADULT_TODEPIGLINS.get());
     }
 
-    public static boolean isWearingGold(Player player) {
+    public static boolean isWearingGold(@NotNull Player player) {
         for(ItemStack itemstack : player.getArmorSlots()) {
             itemstack.getItem();
             if (itemstack.makesPiglinsNeutral(player)) {
@@ -632,12 +636,13 @@ public class TodePiglinMerchantAi {
         return false;
     }
 
-    private static void stopWalking(TodePiglinMerchant todePiglinMerchant) {
+    private static void stopWalking(@NotNull TodePiglinMerchant todePiglinMerchant) {
         todePiglinMerchant.getBrain().eraseMemory(MemoryModuleType.WALK_TARGET);
         todePiglinMerchant.getNavigation().stop();
     }
 
-    private static RunSometimes<TodePiglinMerchant> babySometimesRideBabyHoglin() {
+    @Contract(" -> new")
+    private static @NotNull RunSometimes<TodePiglinMerchant> babySometimesRideBabyHoglin() {
         return new RunSometimes<>(new CopyMemoryWithExpiry<>(TodePiglinMerchant::isBaby, MemoryModuleType.NEAREST_VISIBLE_BABY_HOGLIN, MemoryModuleType.RIDE_TARGET, RIDE_DURATION), RIDE_START_INTERVAL);
     }
 
@@ -689,22 +694,22 @@ public class TodePiglinMerchantAi {
         }
     }
 
-    private static Optional<LivingEntity> getAngerTarget(TodeAbstractPiglin todeAbstractPiglin) {
+    private static @NotNull Optional<LivingEntity> getAngerTarget(TodeAbstractPiglin todeAbstractPiglin) {
         return BehaviorUtils.getLivingEntityFromUUIDMemory(todeAbstractPiglin, MemoryModuleType.ANGRY_AT);
     }
 
-    public static Optional<LivingEntity> getAvoidTarget(TodePiglinMerchant todePiglinMerchant) {
+    public static Optional<LivingEntity> getAvoidTarget(@NotNull TodePiglinMerchant todePiglinMerchant) {
         return todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.AVOID_TARGET) ?
                 todePiglinMerchant.getBrain().getMemory(MemoryModuleType.AVOID_TARGET) : Optional.empty();
     }
 
-    public static Optional<Player> getNearestVisibleTargetablePlayer(TodeAbstractPiglin todeAbstractPiglin) {
+    public static Optional<Player> getNearestVisibleTargetablePlayer(@NotNull TodeAbstractPiglin todeAbstractPiglin) {
         return todeAbstractPiglin.getBrain().hasMemoryValue(MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER) ?
                 todeAbstractPiglin.getBrain().getMemory(MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER) : Optional.empty();
     }
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
-    private static boolean wantsToStopFleeing(TodePiglinMerchant todePiglinMerchant) {
+    private static boolean wantsToStopFleeing(@NotNull TodePiglinMerchant todePiglinMerchant) {
         Brain<TodePiglinMerchant> todePiglinMerchantBrain = todePiglinMerchant.getBrain();
         if (!todePiglinMerchantBrain.hasMemoryValue(MemoryModuleType.AVOID_TARGET)) {
             return true;
@@ -727,7 +732,7 @@ public class TodePiglinMerchantAi {
                 retreatFromNearestTarget((TodePiglinMerchant)todeAbstractPiglin, retreatTarget));
     }
 
-    private static void retreatFromNearestTarget(TodePiglinMerchant todePiglinMerchant, LivingEntity retreatTarget) {
+    private static void retreatFromNearestTarget(@NotNull TodePiglinMerchant todePiglinMerchant, LivingEntity retreatTarget) {
         Brain<TodePiglinMerchant> todePiglinMerchantBrain = todePiglinMerchant.getBrain();
         LivingEntity $$3 = BehaviorUtils.getNearestTarget(todePiglinMerchant, todePiglinMerchantBrain.getMemory(MemoryModuleType.AVOID_TARGET), retreatTarget);
         $$3 = BehaviorUtils.getNearestTarget(todePiglinMerchant, todePiglinMerchantBrain.getMemory(MemoryModuleType.ATTACK_TARGET), $$3);
@@ -738,13 +743,13 @@ public class TodePiglinMerchantAi {
         return !hoglinsOutnumberPiglins(todePiglinMerchant);
     }
 
-    private static boolean hoglinsOutnumberPiglins(TodePiglinMerchant todePiglinMerchant) {
+    private static boolean hoglinsOutnumberPiglins(@NotNull TodePiglinMerchant todePiglinMerchant) {
         int i = todePiglinMerchant.getBrain().getMemory(ModMemoryTypes.VISIBLE_ADULT_TODEPIGLIN_COUNT.get()).orElse(0) + 1;
         int j = todePiglinMerchant.getBrain().getMemory(ModMemoryTypes.VISIBLE_ADULT_TODEPIGLIN_COUNT.get()).orElse(0);
         return j > i;
     }
 
-    private static void setAvoidTargetAndDontHuntForAWhile(TodePiglinMerchant todePiglinMerchant, LivingEntity pTarget) {
+    private static void setAvoidTargetAndDontHuntForAWhile(@NotNull TodePiglinMerchant todePiglinMerchant, LivingEntity pTarget) {
         todePiglinMerchant.getBrain().eraseMemory(MemoryModuleType.ANGRY_AT);
         todePiglinMerchant.getBrain().eraseMemory(MemoryModuleType.ATTACK_TARGET);
         todePiglinMerchant.getBrain().eraseMemory(MemoryModuleType.WALK_TARGET);
@@ -752,43 +757,43 @@ public class TodePiglinMerchantAi {
         dontKillAnyMoreHoglinsForAWhile(todePiglinMerchant);
     }
 
-    public static void dontKillAnyMoreHoglinsForAWhile(TodeAbstractPiglin todeAbstractPiglin) {
+    public static void dontKillAnyMoreHoglinsForAWhile(@NotNull TodeAbstractPiglin todeAbstractPiglin) {
         todeAbstractPiglin.getBrain().setMemoryWithExpiry(
                 MemoryModuleType.HUNTED_RECENTLY, true, TIME_BETWEEN_HUNTS.sample(todeAbstractPiglin.level.random));
     }
 
-    public static boolean seesPlayerHoldingWantedItem(Player todePiglinMerchant) {
+    public static boolean seesPlayerHoldingWantedItem(@NotNull Player todePiglinMerchant) {
         return todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM);
     }
 
     // would be amusing if this piglin type ate more often
-    private static void eat(TodePiglinMerchant todePiglinMerchant) {
+    private static void eat(@NotNull TodePiglinMerchant todePiglinMerchant) {
         todePiglinMerchant.getBrain().setMemoryWithExpiry(MemoryModuleType.ATE_RECENTLY, true, EAT_COOLDOWN);
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private static boolean hasEatenRecently(TodePiglinMerchant todePiglinMerchant) {
+    private static boolean hasEatenRecently(@NotNull TodePiglinMerchant todePiglinMerchant) {
         return todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.ATE_RECENTLY);
     }
 
-    private static Vec3 getRandomNearbyPos(TodePiglinMerchant todePiglinMerchant) {
+    private static @NotNull Vec3 getRandomNearbyPos(TodePiglinMerchant todePiglinMerchant) {
         Vec3 vec3 = LandRandomPos.getPos(todePiglinMerchant, 4, 2);
         return vec3 == null ? todePiglinMerchant.position() : vec3;
     }
 
-    public static boolean isIdle(TodeAbstractPiglin todeAbstractPiglin) {
+    public static boolean isIdle(@NotNull TodeAbstractPiglin todeAbstractPiglin) {
         return todeAbstractPiglin.getBrain().isActive(Activity.IDLE);
     }
 
-    public static boolean hasCrossbow(LivingEntity livingEntity) {
+    public static boolean hasCrossbow(@NotNull LivingEntity livingEntity) {
         return livingEntity.isHolding(is -> is.getItem() instanceof CrossbowItem);
     }
 
-    public static void admireGoldItem(LivingEntity todePiglinMerchant) {
+    public static void admireGoldItem(@NotNull LivingEntity todePiglinMerchant) {
         todePiglinMerchant.getBrain().setMemoryWithExpiry(MemoryModuleType.ADMIRING_ITEM, true, ADMIRE_DURATION);
     }
 
-    public static boolean isAdmiringItem(TodePiglinMerchant todePiglinMerchant) {
+    public static boolean isAdmiringItem(@NotNull TodePiglinMerchant todePiglinMerchant) {
         return todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.ADMIRING_ITEM);
     }
 
@@ -797,15 +802,15 @@ public class TodePiglinMerchantAi {
         TodePiglinBarterCurrencySensor.isBarterCurrency();
     }
 
-    private static boolean isFood(ItemStack pStack) {
+    private static boolean isFood(@NotNull ItemStack pStack) {
         return pStack.is(ItemTags.PIGLIN_FOOD);
     }
 
-    private static boolean isNearRepellent(TodePiglinMerchant todePiglinMerchant) {
+    private static boolean isNearRepellent(@NotNull TodePiglinMerchant todePiglinMerchant) {
         return todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.NEAREST_REPELLENT);
     }
 
-    private static boolean seesPlayerHoldingLovedItem(LivingEntity todePiglinMerchant) {
+    private static boolean seesPlayerHoldingLovedItem(@NotNull LivingEntity todePiglinMerchant) {
         return todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM);
     }
 
@@ -813,23 +818,23 @@ public class TodePiglinMerchantAi {
         return !seesPlayerHoldingLovedItem(player);
     }
 
-    public static boolean isPlayerHoldingLovedItem(LivingEntity player) {
+    public static boolean isPlayerHoldingLovedItem(@NotNull LivingEntity player) {
         return player.getType() == EntityType.PLAYER && player.isHolding(TodePiglinMerchantAi::isLovedItem);
     }
 
-    private static boolean isAdmiringDisabled(TodePiglinMerchant todePiglinMerchant) {
+    private static boolean isAdmiringDisabled(@NotNull TodePiglinMerchant todePiglinMerchant) {
         return todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.ADMIRING_DISABLED);
     }
 
-    private static boolean wasHurtRecently(LivingEntity todePiglinMerchant) {
+    private static boolean wasHurtRecently(@NotNull LivingEntity todePiglinMerchant) {
         return todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.HURT_BY);
     }
 
-    private static boolean isHoldingItemInOffHand(TodePiglinMerchant todePiglinMerchant) {
+    private static boolean isHoldingItemInOffHand(@NotNull TodePiglinMerchant todePiglinMerchant) {
         return !todePiglinMerchant.getOffhandItem().isEmpty();
     }
 
-    private static boolean isNotHoldingLovedItemInOffHand(TodePiglinMerchant todePiglinMerchant) {
+    private static boolean isNotHoldingLovedItemInOffHand(@NotNull TodePiglinMerchant todePiglinMerchant) {
         return todePiglinMerchant.getOffhandItem().isEmpty() || !isLovedItem(todePiglinMerchant.getOffhandItem());
     }
 

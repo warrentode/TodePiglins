@@ -330,7 +330,8 @@ public class TodePiglinMerchant extends TodeAbstractPiglin implements SmartBrain
         super.customServerAiStep();
     }
 
-    //this may also be where right-clicking empty-handed opens up the trade window?
+    /** this may also be where right-clicking empty-handed opens up a trade or bartering window?
+     * creating a bartering GUI might bypass a lot of issues actually **/
     public @NotNull InteractionResult mobInteract(@NotNull Player pPlayer, @NotNull InteractionHand pHand) {
         InteractionResult interactionresult = super.mobInteract(pPlayer, pHand);
         if (interactionresult.consumesAction()) {
