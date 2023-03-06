@@ -1,0 +1,13 @@
+{
+  "type": "todepiglins:bartering",
+  "category": "barter",
+  "group": "gold",
+  "barteritems": [
+    {
+      "tag": "todepiglins:piglin_barter_items"
+    }
+  ],
+  "result": {
+    "tag": "todepiglins:piglin_barter_items"
+  }
+}

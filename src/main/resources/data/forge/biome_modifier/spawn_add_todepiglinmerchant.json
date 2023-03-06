@@ -1,0 +1,14 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": [
+    "minecraft:nether_waste",
+    "minecraft:crimson_forest",
+    "minecraft:bastion_remnant"
+  ],
+  "spawners": {
+    "type": "todepiglins:todepiglinmerchant",
+    "weight": 100,
+    "minCount": 1,
+    "maxCount": 4
+  }
+}

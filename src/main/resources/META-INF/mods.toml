@@ -1,0 +1,41 @@
+modLoader="javafml"
+loaderVersion="[43,)"
+license="GNU_GPL.3"
+#issueTrackerURL="https://github.com/toadie-odie/todepiglins/issues"
+[[mods]]
+modId="todepiglins"
+version="1.19.2-0.0.1"
+displayName="TodePiglins"
+#updateJSONURL="https://change.me.example.invalid/updates.json" #optional
+displayURL="https://github.com/toadie-odie/todepiglins"
+#logoFile="logo.png"
+credits='''Special thanks to my sons, and my supporters:
+Marshal Nash and Trevor Brannigan,
+for supporting my blog and my various projects!'''
+authors="Warren Tode (ToadieOdie)"
+description="This mod adds a variety of villagers with their trades to the game."
+
+[[dependencies.todepiglins]]
+modId="forge"
+mandatory=true
+versionRange="[43,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.todepiglins]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.19.2,1.20)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.todepiglins]]
+modId="smartbrainlib"
+mandatory=true
+versionRange="[1.7,)"
+ordering="NONE"
+side="SERVER"
+
+[modproperties.todepiglins]
+catalogueItemIcon="minecraft:textures/block/gold_ingot.png" #Support for Catalogue mod
+configuredBackground="minecraft:textures/block/netherrack.png" #Support for Configured mod
