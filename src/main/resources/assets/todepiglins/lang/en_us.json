@@ -1,4 +1,7 @@
 {
-  "item.todepiglins.todepiglinmerchant_spawn_egg": "Piglin Merchant Spawn Egg",
-  "entity.todepiglins.todepiglinmerchant": "Piglin Merchant"
+  "entity.todepiglins.todepiglinmerchant": "Piglin Merchant",
+
+  "itemGroup.todepiglins_tab": "TodePiglins",
+
+  "item.todepiglins.todepiglinmerchant_spawn_egg": "Piglin Merchant Spawn Egg"
 }

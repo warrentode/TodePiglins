@@ -7,7 +7,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import net.warrentode.todepiglins.entity.custom.todepiglin.todepiglinmerchant.TodePiglinMerchant;
+import net.warrentode.todepiglins.entity.custom.todepiglinmerchant.TodePiglinMerchant;
 
 import static net.warrentode.todepiglins.TodePiglins.MODID;
 

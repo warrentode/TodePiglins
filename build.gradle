@@ -74,13 +74,17 @@ repositories {
         url "https://cursemaven.com"
     }
     maven {
+        name = "SmartBrainLib (SBL) Maven Repo"
+        url = "https://repo.repsy.io/mvn/tslat/smartbrainlib"
+    }
+    maven {
         url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
     }
 }
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.19.2-43.2.6'
-    implementation fg.deobf("curse.maven:smartbrainlib-661293:4312502-sources-4312505")
+    implementation fg.deobf("net.tslat.smartbrainlib:SmartBrainLib-forge-1.19.2:1.8.1")
     implementation fg.deobf('software.bernie.geckolib:geckolib-forge-1.19:3.1.40')
 }
 jar {
