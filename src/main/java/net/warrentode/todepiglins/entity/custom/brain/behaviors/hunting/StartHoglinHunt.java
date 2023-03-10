@@ -1,4 +1,4 @@
-package net.warrentode.todepiglins.brain.behaviors.hunting;
+package net.warrentode.todepiglins.entity.custom.brain.behaviors.hunting;
 
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -7,7 +7,7 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour;
-import net.warrentode.todepiglins.brain.ModMemoryTypes;
+import net.warrentode.todepiglins.entity.custom.brain.ModMemoryTypes;
 import net.warrentode.todepiglins.entity.custom.todepiglinmerchant.TodePiglinMerchant;
 import org.jetbrains.annotations.NotNull;
 

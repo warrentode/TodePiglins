@@ -1,4 +1,4 @@
-package net.warrentode.todepiglins.brain;
+package net.warrentode.todepiglins.entity.custom.brain;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;

@@ -1,4 +1,4 @@
-package net.warrentode.todepiglins.brain.behaviors.bartering;
+package net.warrentode.todepiglins.entity.custom.brain.behaviors.bartering;
 
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;

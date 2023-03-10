@@ -1,9 +1,9 @@
-package net.warrentode.todepiglins.brain;
+package net.warrentode.todepiglins.entity.custom.brain;
 
 import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
-import net.warrentode.todepiglins.brain.sensors.TodePiglinBarterCurrencySensor;
-import net.warrentode.todepiglins.brain.sensors.TodePiglinSpecificSensor;
+import net.warrentode.todepiglins.entity.custom.brain.sensors.TodePiglinBarterCurrencySensor;
+import net.warrentode.todepiglins.entity.custom.brain.sensors.TodePiglinSpecificSensor;
 import net.warrentode.todepiglins.entity.custom.todepiglinmerchant.TodePiglinMerchant;
 import org.jetbrains.annotations.NotNull;
 

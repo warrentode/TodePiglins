@@ -1,7 +1,6 @@
-package net.warrentode.todepiglins.brain.sensors;
+package net.warrentode.todepiglins.entity.custom.brain.sensors;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -15,13 +14,16 @@ import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.monster.WitherSkeleton;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
+import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
+import net.minecraft.world.entity.monster.piglin.Piglin;
+import net.minecraft.world.entity.monster.piglin.PiglinBrute;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
-import net.warrentode.todepiglins.brain.ModMemoryTypes;
-import net.warrentode.todepiglins.brain.ModSensorTypes;
+import net.warrentode.todepiglins.entity.custom.brain.ModMemoryTypes;
+import net.warrentode.todepiglins.entity.custom.brain.ModSensorTypes;
 import net.warrentode.todepiglins.entity.custom.todepiglinmerchant.TodePiglinMerchant;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,8 +40,6 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
                     MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES,
                     MemoryModuleType.NEAREST_VISIBLE_PLAYER,
                     MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER,
-                    MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS,
-                    MemoryModuleType.NEARBY_ADULT_PIGLINS,
                     MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM,
                     MemoryModuleType.HURT_BY,
                     MemoryModuleType.HURT_BY_ENTITY,
@@ -63,13 +63,15 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
                     MemoryModuleType.NEAREST_VISIBLE_NEMESIS,
                     MemoryModuleType.NEAREST_VISIBLE_ZOMBIFIED,
                     MemoryModuleType.RIDE_TARGET,
-                    MemoryModuleType.VISIBLE_ADULT_PIGLIN_COUNT,
                     MemoryModuleType.VISIBLE_ADULT_HOGLIN_COUNT,
                     MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN,
                     MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD,
                     MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM,
                     MemoryModuleType.ATE_RECENTLY,
                     MemoryModuleType.NEAREST_REPELLENT,
+                    MemoryModuleType.NEARBY_ADULT_PIGLINS,
+                    MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS,
+                    MemoryModuleType.VISIBLE_ADULT_PIGLIN_COUNT,
                     // custom memory types
                     ModMemoryTypes.NEARBY_ADULT_TODEPIGLINS.get(),
                     ModMemoryTypes.NEAREST_VISIBLE_ADULT_TODEPIGLINS.get(),
@@ -91,95 +93,122 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
     protected void doTick(ServerLevel pLevel, E pEntity)  {
         Brain<?> brain = pEntity.getBrain();
         brain.setMemory(MemoryModuleType.NEAREST_REPELLENT, findNearestRepellent(pLevel, pEntity));
-        Optional<Mob> optional = Optional.empty();
-        Optional<Hoglin> optional1 = Optional.empty();
-        Optional<Hoglin> optional2 = Optional.empty();
-        Optional<TodePiglinMerchant> optional3 = Optional.empty();
-        Optional<LivingEntity> optional4 = Optional.empty();
-        Optional<Player> optional5 = Optional.empty();
-        Optional<Player> optional6 = Optional.empty();
-        int i = 0;
-        List<TodePiglinMerchant> list = Lists.newArrayList();
-        List<TodePiglinMerchant> list1 = Lists.newArrayList();
+        Optional<Mob> weirdos = Optional.empty();
+        Optional<Hoglin> huntableHoglin = Optional.empty();
+        Optional<Hoglin> babyHoglin = Optional.empty();
+        Optional<TodePiglinMerchant> babyTodePiglins = Optional.empty();
+        Optional<AbstractPiglin> babyPiglins = Optional.empty();
+        Optional<LivingEntity> zombie = Optional.empty();
+        Optional<Player> playerNoGold = Optional.empty();
+        Optional<Player> playerGoodie = Optional.empty();
+        int adultHoglins = 0;
+        List<TodePiglinMerchant> visibleAdultTodePiglins = new ObjectArrayList<>();
+        List<TodePiglinMerchant> adultTodePiglins = new ObjectArrayList<>();
+        List<AbstractPiglin> adultPiglins = new ObjectArrayList<>();
+        List<AbstractPiglin> visibleAdultPiglins = new ObjectArrayList<>();
         NearestVisibleLivingEntities nearestvisiblelivingentities =
                 brain.getMemory(MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES).orElse(NearestVisibleLivingEntities.empty());
 
         for(LivingEntity livingEntity : nearestvisiblelivingentities.findAll((livingEntity) -> true)) {
-            // detect hoglin population
+            // DETECT HOGLIN POPULATION
             if (livingEntity instanceof Hoglin hoglin) {
                 // check for baby hoglins
-                if (hoglin.isBaby() && optional2.isEmpty()) {
-                    optional2 = Optional.of(hoglin);
+                if (hoglin.isBaby() && babyHoglin.isEmpty()) {
+                    babyHoglin = Optional.of(hoglin);
                 }
                 // check for adult hoglins
                 else if (hoglin.isAdult()) {
-                    ++i;
-                    if (optional1.isEmpty() && hoglin.canBeHunted()) {
-                        optional1 = Optional.of(hoglin);
+                    ++adultHoglins;
+                    if (huntableHoglin.isEmpty() && hoglin.canBeHunted()) {
+                        huntableHoglin = Optional.of(hoglin);
                     }
                 }
             }
-            // detect fellow piglins
-            else if (livingEntity instanceof TodePiglinMerchant todePiglinMerchant) {
-                list.add(todePiglinMerchant);
+            // DETECT COMMUNITY & ALLIES
+            // detect vanilla piglin brutes
+            else if (livingEntity instanceof PiglinBrute brute) {
+                visibleAdultPiglins.add(brute);
             }
-            else if (livingEntity instanceof TodePiglinMerchant todePiglinMerchant) {
-                //  detect baby piglins
-                if (todePiglinMerchant.isBaby() && optional3.isEmpty()) {
-                    optional3 = Optional.of(todePiglinMerchant);
+            // detect vanilla piglins
+            else if (livingEntity instanceof Piglin piglin) {
+                // detect baby vanilla piglins
+                if (piglin.isBaby() && babyPiglins.isEmpty()) {
+                    babyPiglins = Optional.of(piglin);
                 }
-                // detect adult piglins
+                // detect adult vanilla piglins
+                else if (piglin.isAdult()) {
+                    visibleAdultPiglins.add(piglin);
+                }
+            }
+            // detect todepiglins
+            else if (livingEntity instanceof TodePiglinMerchant todePiglinMerchant) {
+                //  detect baby todepiglins
+                if (todePiglinMerchant.isBaby() && babyTodePiglins.isEmpty()) {
+                    babyTodePiglins = Optional.of(todePiglinMerchant);
+                }
+                // detect adult todepiglins
                 else if (todePiglinMerchant.isAdult()) {
-                    list.add(todePiglinMerchant);
+                    visibleAdultTodePiglins.add(todePiglinMerchant);
                 }
             }
-            else if (livingEntity instanceof Player player) {
+            // PLAYER DETECTION
+            else if (livingEntity instanceof Player player && !(livingEntity instanceof TodePiglinMerchant)) {
                 // detect players not wearing gold
-                if (optional5.isEmpty() && !TodePiglinMerchant.isWearingGold(player)
-                        && pEntity.canAttack(livingEntity)) {
-                    optional5 = Optional.of(player);
+                if (playerNoGold.isEmpty() && !TodePiglinMerchant.isWearingGold(player)
+                        && pEntity.canAttack(player)) {
+                    playerNoGold = Optional.of(player);
                 }
                 // detect players holding loved items
-                if (optional6.isEmpty() && !player.isSpectator() && TodePiglinMerchant.isPlayerHoldingLovedItem(player)) {
-                    optional6 = Optional.of(player);
+                if (playerGoodie.isEmpty() && !player.isSpectator() && TodePiglinMerchant.isPlayerHoldingLovedItem(player)) {
+                    playerGoodie = Optional.of(player);
                 }
                 // detect players holding wanted items
-                if (optional6.isEmpty() && !player.isSpectator() && TodePiglinMerchant.seesPlayerHoldingWantedItem(player)) {
-                    optional6 = Optional.of(player);
+                if (playerGoodie.isEmpty() && !player.isSpectator() && TodePiglinMerchant.seesPlayerHoldingWantedItem(player)) {
+                    playerGoodie = Optional.of(player);
                 }
             }
-            // detect the weirdos
-            else if (optional.isPresent() || !(livingEntity instanceof WitherSkeleton) && !(livingEntity instanceof WitherBoss)) {
+            // DETECT THE WEIRDOS
+            else if (weirdos.isPresent() || !(livingEntity instanceof WitherSkeleton) && !(livingEntity instanceof WitherBoss)) {
                 // detect zombie piglins and zoglins
-                if (optional4.isEmpty() && TodePiglinMerchant.isZombified(livingEntity.getType())) {
-                    optional4 = Optional.of(livingEntity);
+                if (zombie.isEmpty() && TodePiglinMerchant.isZombified(livingEntity.getType())) {
+                    zombie = Optional.of(livingEntity);
                 }
             }
             // make note of whatever else
             else {
-                optional = Optional.of((Mob)livingEntity);
+                weirdos = Optional.of((Mob)livingEntity);
             }
         }
 
         for(LivingEntity livingEntity1 : brain.getMemory(MemoryModuleType.NEAREST_LIVING_ENTITIES).orElse(ImmutableList.of())) {
             if (livingEntity1 instanceof TodePiglinMerchant todePiglinMerchant) {
-                // add to the list the nearest adult piglins
+                // add to the list the nearest adult todepiglins
                 if (todePiglinMerchant.isAdult()) {
-                    list1.add(todePiglinMerchant);
+                    adultTodePiglins.add(todePiglinMerchant);
+                }
+            } else if (livingEntity1 instanceof AbstractPiglin abstractPiglin) {
+                // add to the list the nearest adult piglins
+                if (abstractPiglin.isAdult()) {
+                    adultPiglins.add(abstractPiglin);
                 }
             }
         }
 
-        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_NEMESIS, optional);
-        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN, optional1);
-        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_BABY_HOGLIN, optional2);
-        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_ZOMBIFIED, optional4);
-        brain.setMemory(MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD, optional5);
-        brain.setMemory(MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM, optional6);
-        brain.setMemory(ModMemoryTypes.NEARBY_ADULT_TODEPIGLINS.get(), list1);
-        brain.setMemory(ModMemoryTypes.NEAREST_VISIBLE_ADULT_TODEPIGLINS.get(), list);
-        brain.setMemory(ModMemoryTypes.VISIBLE_ADULT_TODEPIGLIN_COUNT.get(), list.size());
-        brain.setMemory(MemoryModuleType.VISIBLE_ADULT_HOGLIN_COUNT, i);
+        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_NEMESIS, weirdos);
+        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN, huntableHoglin);
+        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_BABY_HOGLIN, babyHoglin);
+        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_ZOMBIFIED, zombie);
+        brain.setMemory(MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD, playerNoGold);
+        brain.setMemory(MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM, playerGoodie);
+        brain.setMemory(MemoryModuleType.VISIBLE_ADULT_HOGLIN_COUNT, adultHoglins);
+        // vanilla community
+        brain.setMemory(MemoryModuleType.NEARBY_ADULT_PIGLINS, adultPiglins);
+        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS, visibleAdultPiglins);
+        brain.setMemory(MemoryModuleType.VISIBLE_ADULT_PIGLIN_COUNT, visibleAdultPiglins.size());
+        // custom community
+        brain.setMemory(ModMemoryTypes.NEARBY_ADULT_TODEPIGLINS.get(), adultTodePiglins);
+        brain.setMemory(ModMemoryTypes.NEAREST_VISIBLE_ADULT_TODEPIGLINS.get(), visibleAdultTodePiglins);
+        brain.setMemory(ModMemoryTypes.VISIBLE_ADULT_TODEPIGLIN_COUNT.get(), visibleAdultTodePiglins.size());
     }
 
     private static @NotNull Optional<BlockPos> findNearestRepellent(ServerLevel pLevel, @NotNull LivingEntity livingEntity) {

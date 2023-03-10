@@ -9,7 +9,7 @@ import static net.warrentode.todepiglins.TodePiglins.MODID;
 public class TodePiglinMerchantModel extends AnimatedGeoModel<TodePiglinMerchant> {
     @Override
     public ResourceLocation getModelResource(TodePiglinMerchant object) {
-        return new ResourceLocation(MODID, "geo/entity/todepiglin/todepiglinmerchant.json");
+        return new ResourceLocation(MODID, "geo/entity/todepiglin/todepiglinmerchant.geo.json");
     }
 
     @Override

@@ -1,4 +1,4 @@
-package net.warrentode.todepiglins.brain.sensors;
+package net.warrentode.todepiglins.entity.custom.brain.sensors;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.particles.ParticleTypes;
@@ -17,8 +17,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
 import net.tslat.smartbrainlib.util.BrainUtils;
-import net.warrentode.todepiglins.brain.ModMemoryTypes;
-import net.warrentode.todepiglins.brain.ModSensorTypes;
+import net.warrentode.todepiglins.entity.custom.brain.ModMemoryTypes;
+import net.warrentode.todepiglins.entity.custom.brain.ModSensorTypes;
 import net.warrentode.todepiglins.entity.custom.todepiglinmerchant.TodePiglinMerchant;
 import net.warrentode.todepiglins.util.ModTags;
 import org.jetbrains.annotations.NotNull;

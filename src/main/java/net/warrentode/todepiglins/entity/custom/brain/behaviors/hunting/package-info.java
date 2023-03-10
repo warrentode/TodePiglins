@@ -1,7 +1,7 @@
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
-package net.warrentode.todepiglins.brain.behaviors.bartering;
+package net.warrentode.todepiglins.entity.custom.brain.behaviors.hunting;
 
 import net.minecraft.FieldsAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
