@@ -106,12 +106,12 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
         List<TodePiglinMerchant> adultTodePiglins = new ObjectArrayList<>();
         List<AbstractPiglin> adultPiglins = new ObjectArrayList<>();
         List<AbstractPiglin> visibleAdultPiglins = new ObjectArrayList<>();
-        NearestVisibleLivingEntities nearestvisiblelivingentities =
+        NearestVisibleLivingEntities nearestVisible =
                 brain.getMemory(MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES).orElse(NearestVisibleLivingEntities.empty());
 
-        for(LivingEntity livingEntity : nearestvisiblelivingentities.findAll((livingEntity) -> true)) {
+        for(LivingEntity target : nearestVisible.findAll((livingEntity) -> true)) {
             // DETECT HOGLIN POPULATION
-            if (livingEntity instanceof Hoglin hoglin) {
+            if (target instanceof Hoglin hoglin) {
                 // check for baby hoglins
                 if (hoglin.isBaby() && babyHoglin.isEmpty()) {
                     babyHoglin = Optional.of(hoglin);
@@ -126,11 +126,11 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
             }
             // DETECT COMMUNITY & ALLIES
             // detect vanilla piglin brutes
-            else if (livingEntity instanceof PiglinBrute brute) {
+            else if (target instanceof PiglinBrute brute) {
                 visibleAdultPiglins.add(brute);
             }
             // detect vanilla piglins
-            else if (livingEntity instanceof Piglin piglin) {
+            else if (target instanceof Piglin piglin) {
                 // detect baby vanilla piglins
                 if (piglin.isBaby() && babyPiglins.isEmpty()) {
                     babyPiglins = Optional.of(piglin);
@@ -141,7 +141,7 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
                 }
             }
             // detect todepiglins
-            else if (livingEntity instanceof TodePiglinMerchant todePiglinMerchant) {
+            else if (target instanceof TodePiglinMerchant todePiglinMerchant) {
                 //  detect baby todepiglins
                 if (todePiglinMerchant.isBaby() && babyTodePiglins.isEmpty()) {
                     babyTodePiglins = Optional.of(todePiglinMerchant);
@@ -152,7 +152,7 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
                 }
             }
             // PLAYER DETECTION
-            else if (livingEntity instanceof Player player && !(livingEntity instanceof TodePiglinMerchant)) {
+            else if (target instanceof Player player && !(target instanceof TodePiglinMerchant)) {
                 // detect players not wearing gold
                 if (playerNoGold.isEmpty() && !TodePiglinMerchant.isWearingGold(player)
                         && pEntity.canAttack(player)) {
@@ -168,18 +168,19 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
                 }
             }
             // DETECT THE WEIRDOS
-            else if (weirdos.isPresent() || !(livingEntity instanceof WitherSkeleton) && !(livingEntity instanceof WitherBoss)) {
-                // detect zombie piglins and zoglins
-                if (zombie.isEmpty() && TodePiglinMerchant.isZombified(livingEntity.getType())) {
-                    zombie = Optional.of(livingEntity);
+            else if (weirdos.isPresent() || !(target instanceof WitherSkeleton) && !(target instanceof WitherBoss)) {
+                // detect zombie types
+                if (zombie.isEmpty() && TodePiglinMerchant.isZombified(target.getType())) {
+                    zombie = Optional.of(target);
                 }
             }
-            // make note of whatever else
+            // make note of whatever else - but especially the mortal enemy
             else {
-                weirdos = Optional.of((Mob)livingEntity);
+                weirdos = Optional.of((Mob)target);
             }
         }
 
+        // listing the allies
         for(LivingEntity livingEntity1 : brain.getMemory(MemoryModuleType.NEAREST_LIVING_ENTITIES).orElse(ImmutableList.of())) {
             if (livingEntity1 instanceof TodePiglinMerchant todePiglinMerchant) {
                 // add to the list the nearest adult todepiglins
@@ -194,18 +195,21 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
             }
         }
 
+        // weirdos and zombies
         brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_NEMESIS, weirdos);
-        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN, huntableHoglin);
-        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_BABY_HOGLIN, babyHoglin);
         brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_ZOMBIFIED, zombie);
+        // hoglin population
+        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_BABY_HOGLIN, babyHoglin);
+        brain.setMemory(MemoryModuleType.VISIBLE_ADULT_HOGLIN_COUNT, adultHoglins);
+        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN, huntableHoglin);
+        // players
         brain.setMemory(MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD, playerNoGold);
         brain.setMemory(MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM, playerGoodie);
-        brain.setMemory(MemoryModuleType.VISIBLE_ADULT_HOGLIN_COUNT, adultHoglins);
-        // vanilla community
+        // vanilla piglin community
         brain.setMemory(MemoryModuleType.NEARBY_ADULT_PIGLINS, adultPiglins);
         brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS, visibleAdultPiglins);
         brain.setMemory(MemoryModuleType.VISIBLE_ADULT_PIGLIN_COUNT, visibleAdultPiglins.size());
-        // custom community
+        // custom piglin community
         brain.setMemory(ModMemoryTypes.NEARBY_ADULT_TODEPIGLINS.get(), adultTodePiglins);
         brain.setMemory(ModMemoryTypes.NEAREST_VISIBLE_ADULT_TODEPIGLINS.get(), visibleAdultTodePiglins);
         brain.setMemory(ModMemoryTypes.VISIBLE_ADULT_TODEPIGLIN_COUNT.get(), visibleAdultTodePiglins.size());
