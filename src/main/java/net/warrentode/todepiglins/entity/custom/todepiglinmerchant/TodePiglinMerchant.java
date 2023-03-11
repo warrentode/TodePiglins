@@ -122,7 +122,6 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     private static final double ATTACK_DAMAGE = 7.0D;
     private static final float CROSSBOW_POWER = 1.6F;
     private static final int MIN_DESIRED_DIST_FROM_TARGET_WHEN_HOLDING_CROSSBOW = 5;
-    private static final float SPEED_WHEN_STRAFING_BACK_FROM_TARGET = 0.75F;
     private static final float CHANCE_OF_WEARING_EACH_ARMOUR_ITEM = 0.1F;
     private static final double PROBABILITY_OF_SPAWNING_WITH_CROSSBOW_INSTEAD_OF_SWORD = 0.5D;
     public static final int DESIRED_DISTANCE_FROM_REPELLENT = 8;
@@ -141,8 +140,6 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     private static final int DESIRED_DISTANCE_FROM_ZOMBIFIED = 6;
     private static final float SPEED_MULTIPLIER_WHEN_AVOIDING = 1.0F;
     private static final double AVOID_DISTANCE = 12.0D;
-    private static final float MAX_LOOK_DIST_FOR_PLAYER_HOLDING_LOVED_ITEM = 14.0F;
-    private static final int INTERACTION_RANGE = 8;
     private static final float SPEED_IDLE = 0.6F;
     public final SimpleContainer inventory = new SimpleContainer(8);
     public static @NotNull Ingredient getBarterItems() {
@@ -764,16 +761,13 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     private PlayState defaultPredicate(@NotNull AnimationEvent<TodePiglinMerchant> event) {
         if (event.isMoving()) {
             if (this.swinging) {
-                event.getController().markNeedsReload();
                 event.getController().setAnimation(new AnimationBuilder().addAnimation("walk_legs_only", LOOP));
             }
             else {
-                event.getController().markNeedsReload();
                 event.getController().setAnimation(new AnimationBuilder().addAnimation("walk", LOOP));
             }
         }
         else {
-            event.getController().markNeedsReload();
             event.getController().setAnimation(new AnimationBuilder().addAnimation("idle", LOOP));
         }
         return PlayState.CONTINUE;
@@ -924,7 +918,7 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     }
 
     // targeting
-    public static boolean isAlly(LivingEntity livingEntity, LivingEntity checkedEntity) {
+    public static boolean isAlly(LivingEntity checkedEntity) {
         return checkedEntity instanceof AbstractPiglin;
     }
 
@@ -946,7 +940,7 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
             return Optional.empty();
         }
         // ignore allies
-        else if (isAlly(livingentity, livingentity)) {
+        else if (isAlly(livingentity)) {
             return Optional.empty();
         }
         else {
