@@ -88,9 +88,8 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
         return ModSensorTypes.TODEPIGLIN_SPECIFIC.get();
     }
 
-    @SuppressWarnings("ConstantValue")
     @Override
-    protected void doTick(ServerLevel pLevel, E pEntity)  {
+    protected void doTick(ServerLevel pLevel, @NotNull E pEntity)  {
         Brain<?> brain = pEntity.getBrain();
         brain.setMemory(MemoryModuleType.NEAREST_REPELLENT, findNearestRepellent(pLevel, pEntity));
         Optional<Mob> weirdos = Optional.empty();
@@ -152,7 +151,7 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
                 }
             }
             // PLAYER DETECTION
-            else if (target instanceof Player player && !(target instanceof TodePiglinMerchant)) {
+            else if (target instanceof Player player) {
                 // detect players not wearing gold
                 if (playerNoGold.isEmpty() && !TodePiglinMerchant.isWearingGold(player)
                         && pEntity.canAttack(player)) {

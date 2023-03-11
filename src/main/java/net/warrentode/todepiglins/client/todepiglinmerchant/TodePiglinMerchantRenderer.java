@@ -21,18 +21,11 @@ import software.bernie.geckolib3.core.processor.IBone;
 import software.bernie.geckolib3.geo.render.built.GeoBone;
 import software.bernie.geckolib3.renderers.geo.ExtendedGeoEntityRenderer;
 
-import static net.warrentode.todepiglins.TodePiglins.MODID;
-
 public class TodePiglinMerchantRenderer extends ExtendedGeoEntityRenderer<TodePiglinMerchant> {
-
     protected ItemStack mainHandItem, offHandItem, helmetItem, chestplateItem, leggingsItem, bootsItem;
     public TodePiglinMerchantRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new TodePiglinMerchantModel());
         this.shadowRadius = 0.6f;
-    }
-    @Override
-    public @NotNull ResourceLocation getTextureLocation(@NotNull TodePiglinMerchant instance) {
-        return new ResourceLocation(MODID, "textures/entity/todepiglin/todepiglinmerchant.png");
     }
     @Override
     public RenderType getRenderType(TodePiglinMerchant animatable, float partialTick, PoseStack poseStack,
@@ -53,72 +46,21 @@ public class TodePiglinMerchantRenderer extends ExtendedGeoEntityRenderer<TodePi
         this.leggingsItem = animatable.getItemBySlot(EquipmentSlot.LEGS);
         this.bootsItem = animatable.getItemBySlot(EquipmentSlot.FEET);
     }
-
+    @Nullable
     @Override
-    protected ResourceLocation getTextureForBone(String boneName, TodePiglinMerchant animatable) {
-        return null;
-    }
-    @Override
-    protected boolean isArmorBone(@NotNull GeoBone bone) {
-        return bone.getName().startsWith("armor");
-    }
-    @Override
-    protected ItemStack getArmorForBone(@NotNull String boneName, TodePiglinMerchant currentEntity) {
+    protected ItemStack getHeldItemForBone(@NotNull String boneName, TodePiglinMerchant animatable) {
         return switch (boneName) {
-            case TPMBoneIndents.LEFT_FOOT_ARMOR_BONE_INDENT,
-                    TPMBoneIndents.RIGHT_FOOT_ARMOR_BONE_INDENT -> this.bootsItem;
-            case TPMBoneIndents.LEFT_LEG_ARMOR_BONE_INDENT,
-                    TPMBoneIndents.RIGHT_LEG_ARMOR_BONE_INDENT -> this.leggingsItem;
-            case TPMBoneIndents.BODY_ARMOR_BONE_INDENT,
-                    TPMBoneIndents.RIGHT_ARM_ARMOR_BONE_INDENT,
-                    TPMBoneIndents.LEFT_ARM_ARMOR_BONE_INDENT -> this.chestplateItem;
-            case TPMBoneIndents.HEAD_ARMOR_BONE_INDENT -> this.helmetItem;
-            default -> null;
-        };
-    }
-    @Override
-    protected EquipmentSlot getEquipmentSlotForArmorBone(@NotNull String boneName, TodePiglinMerchant currentEntity) {
-        return switch (boneName) {
-            case TPMBoneIndents.LEFT_FOOT_ARMOR_BONE_INDENT,
-                    TPMBoneIndents.RIGHT_FOOT_ARMOR_BONE_INDENT -> EquipmentSlot.FEET;
-            case TPMBoneIndents.LEFT_LEG_ARMOR_BONE_INDENT,
-                    TPMBoneIndents.RIGHT_LEG_ARMOR_BONE_INDENT -> EquipmentSlot.LEGS;
-            case TPMBoneIndents.RIGHT_ARM_ARMOR_BONE_INDENT -> !currentEntity.isLeftHanded() ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
-            case TPMBoneIndents.LEFT_ARM_ARMOR_BONE_INDENT -> currentEntity.isLeftHanded() ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
-            case TPMBoneIndents.BODY_ARMOR_BONE_INDENT -> EquipmentSlot.CHEST;
-            case TPMBoneIndents.HEAD_ARMOR_BONE_INDENT -> EquipmentSlot.HEAD;
-            default -> null;
-        };
-    }
-    @Override
-    protected ModelPart getArmorPartForBone(@NotNull String name, HumanoidModel<?> armorModel) {
-        return switch (name) {
-            case TPMBoneIndents.LEFT_FOOT_ARMOR_BONE_IDENT,
-                    TPMBoneIndents.LEFT_LEG_ARMOR_BONE_IDENT -> armorModel.leftLeg;
-            case TPMBoneIndents.RIGHT_FOOT_ARMOR_BONE_IDENT,
-                    TPMBoneIndents.RIGHT_LEG_ARMOR_BONE_IDENT -> armorModel.rightLeg;
-            case TPMBoneIndents.RIGHT_ARM_ARMOR_BONE_IDENT -> armorModel.rightArm;
-            case TPMBoneIndents.LEFT_ARM_ARMOR_BONE_IDENT -> armorModel.leftArm;
-            case TPMBoneIndents.BODY_ARMOR_BONE_IDENT -> armorModel.body;
-            case TPMBoneIndents.HEAD_ARMOR_BONE_IDENT -> armorModel.head;
+            case TPMBoneIdents.LEFT_HAND_BONE_IDENT -> animatable.isLeftHanded() ? mainHandItem : offHandItem;
+            case TPMBoneIdents.RIGHT_HAND_BONE_IDENT -> animatable.isLeftHanded() ? offHandItem : mainHandItem;
             default -> null;
         };
     }
     @Override
     protected ItemTransforms.TransformType getCameraTransformForItemAtBone(ItemStack boneItem, @NotNull String boneName) {
         return switch (boneName) {
-            case TPMBoneIndents.LEFT_HAND_BONE_INDENT, TPMBoneIndents.RIGHT_HAND_BONE_INDENT -> 
+            case TPMBoneIdents.LEFT_HAND_BONE_IDENT, TPMBoneIdents.RIGHT_HAND_BONE_IDENT ->
                     ItemTransforms.TransformType.THIRD_PERSON_RIGHT_HAND; // Do Defaults
             default -> ItemTransforms.TransformType.NONE;
-        };
-    }
-    @Nullable
-    @Override
-    protected ItemStack getHeldItemForBone(@NotNull String boneName, TodePiglinMerchant animatable) {
-        return switch (boneName) {
-            case TPMBoneIndents.LEFT_HAND_BONE_INDENT -> animatable.isLeftHanded() ? mainHandItem : offHandItem;
-            case TPMBoneIndents.RIGHT_HAND_BONE_INDENT -> animatable.isLeftHanded() ? offHandItem : mainHandItem;
-            default -> null;
         };
     }
     @Override
@@ -140,6 +82,48 @@ public class TodePiglinMerchantRenderer extends ExtendedGeoEntityRenderer<TodePi
     }
     @Override
     protected void postRenderItem(PoseStack poseStack, ItemStack stack, String boneName, TodePiglinMerchant animatable, IBone bone) {}
+    @Override
+    protected ItemStack getArmorForBone(@NotNull String boneName, TodePiglinMerchant currentEntity) {
+        return switch (boneName) {
+            case TPMBoneIdents.LEFT_FOOT_ARMOR_BONE_IDENT,
+                    TPMBoneIdents.RIGHT_FOOT_ARMOR_BONE_IDENT -> this.bootsItem;
+            case TPMBoneIdents.LEFT_LEG_ARMOR_BONE_IDENT,
+                    TPMBoneIdents.RIGHT_LEG_ARMOR_BONE_IDENT -> this.leggingsItem;
+            case TPMBoneIdents.BODY_ARMOR_BONE_IDENT,
+                    TPMBoneIdents.RIGHT_ARM_ARMOR_BONE_IDENT,
+                    TPMBoneIdents.LEFT_ARM_ARMOR_BONE_IDENT -> this.chestplateItem;
+            case TPMBoneIdents.HEAD_ARMOR_BONE_IDENT -> this.helmetItem;
+            default -> null;
+        };
+    }
+    @Override
+    protected EquipmentSlot getEquipmentSlotForArmorBone(@NotNull String boneName, TodePiglinMerchant currentEntity) {
+        return switch (boneName) {
+            case TPMBoneIdents.LEFT_FOOT_ARMOR_BONE_IDENT,
+                    TPMBoneIdents.RIGHT_FOOT_ARMOR_BONE_IDENT -> EquipmentSlot.FEET;
+            case TPMBoneIdents.LEFT_LEG_ARMOR_BONE_IDENT,
+                    TPMBoneIdents.RIGHT_LEG_ARMOR_BONE_IDENT -> EquipmentSlot.LEGS;
+            case TPMBoneIdents.BODY_ARMOR_BONE_IDENT -> EquipmentSlot.CHEST;
+            case TPMBoneIdents.HEAD_ARMOR_BONE_IDENT -> EquipmentSlot.HEAD;
+            case TPMBoneIdents.LEFT_HAND_BONE_IDENT -> !currentEntity.isLeftHanded() ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+            case TPMBoneIdents.RIGHT_HAND_BONE_IDENT -> currentEntity.isLeftHanded() ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+            default -> null;
+        };
+    }
+    @Override
+    protected ModelPart getArmorPartForBone(@NotNull String name, HumanoidModel<?> armorModel) {
+        return switch (name) {
+            case TPMBoneIdents.LEFT_FOOT_ARMOR_BONE_IDENT,
+                    TPMBoneIdents.LEFT_LEG_ARMOR_BONE_IDENT -> armorModel.leftLeg;
+            case TPMBoneIdents.RIGHT_FOOT_ARMOR_BONE_IDENT,
+                    TPMBoneIdents.RIGHT_LEG_ARMOR_BONE_IDENT -> armorModel.rightLeg;
+            case TPMBoneIdents.RIGHT_ARM_ARMOR_BONE_IDENT -> armorModel.rightArm;
+            case TPMBoneIdents.LEFT_ARM_ARMOR_BONE_IDENT -> armorModel.leftArm;
+            case TPMBoneIdents.BODY_ARMOR_BONE_IDENT -> armorModel.body;
+            case TPMBoneIdents.HEAD_ARMOR_BONE_IDENT -> armorModel.head;
+            default -> null;
+        };
+    }
     @Nullable
     @Override
     protected BlockState getHeldBlockForBone(String boneName, TodePiglinMerchant animatable) {
@@ -149,4 +133,13 @@ public class TodePiglinMerchantRenderer extends ExtendedGeoEntityRenderer<TodePi
     protected void preRenderBlock(PoseStack poseStack, BlockState state, String boneName, TodePiglinMerchant animatable) {}
     @Override
     protected void postRenderBlock(PoseStack poseStack, BlockState state, String boneName, TodePiglinMerchant animatable) {}
+
+    @Override
+    protected ResourceLocation getTextureForBone(String boneName, TodePiglinMerchant animatable) {
+        return null;
+    }
+    @Override
+    protected boolean isArmorBone(@NotNull GeoBone bone) {
+        return bone.getName().startsWith("armor");
+    }
 }

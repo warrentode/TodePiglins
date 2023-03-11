@@ -34,6 +34,7 @@ import net.minecraft.world.entity.ai.sensing.Sensor;
 import net.minecraft.world.entity.ai.util.GoalUtils;
 import net.minecraft.world.entity.ai.util.LandRandomPos;
 import net.minecraft.world.entity.animal.horse.ZombieHorse;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.*;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
@@ -63,15 +64,14 @@ import net.tslat.smartbrainlib.api.SmartBrainOwner;
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup;
 import net.tslat.smartbrainlib.api.core.SmartBrain;
 import net.tslat.smartbrainlib.api.core.SmartBrainProvider;
+import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableRangedAttack;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.move.AvoidEntity;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.move.MoveToWalkTarget;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.move.StrafeTarget;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.move.WalkOrRunToWalkTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.move.*;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetRandomWalkTarget;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.target.InvalidateAttackTarget;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetRandomLookTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.target.*;
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
 import net.tslat.smartbrainlib.api.core.sensor.custom.NearbyBlocksSensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.HurtBySensor;
@@ -291,10 +291,12 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
                         .setPredicate((target, entity)->
                                 target instanceof Player ||
                                         target instanceof Zombie ||
-                                        target instanceof ZombieVillager ||
                                         target instanceof ZombieHorse ||
-                                        target instanceof Hoglin ||
+                                        target instanceof ZombieVillager ||
                                         target instanceof ZombifiedPiglin ||
+                                        target instanceof Hoglin ||
+                                        target instanceof WitherBoss ||
+                                        target instanceof WitherSkeleton ||
                                         target instanceof AbstractPiglin ||
                                         target instanceof TodePiglinMerchant),
                 new NearbyPlayersSensor<>(),
@@ -333,32 +335,40 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     public BrainActivityGroup<TodePiglinMerchant> getIdleTasks() {
         //noinspection unchecked
         return BrainActivityGroup.idleTasks(
-                new SetEntityLookTarget(TodePiglinMerchant::isPlayerHoldingLovedItem, MAX_LOOK_DIST_FOR_PLAYER_HOLDING_LOVED_ITEM),
-                new StartAttacking<>(TodePiglinMerchant::isAdult, TodePiglinMerchant::findNearestValidAttackTarget),
-                new StartHoglinHunt().startCondition(TodePiglinMerchant::canHunt),
-                new SetWalkTargetAwayFrom<>(MemoryModuleType.NEAREST_REPELLENT, SPEED_MULTIPLIER_WHEN_AVOIDING, DESIRED_DISTANCE_FROM_REPELLENT, false, Vec3::atBottomCenterOf),
-                new SetLookAndInteract(EntityType.PLAYER, INTERACTION_RANGE),
+                new FirstApplicableBehaviour<>(
+                        new TargetOrRetaliate<>().useMemory(MemoryModuleType.HURT_BY_ENTITY),
+                        new TargetOrRetaliate<>().useMemory(MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER),
+                        new SetAttackTarget<>().attackPredicate(TodePiglinMerchant::isNearestValidAttackTarget),
+                        new StartHoglinHunt().startCondition(TodePiglinMerchant::canHunt),
+                        new SetPlayerLookTarget<>().predicate(TodePiglinMerchant::isPlayerHoldingLovedItem)
+                ),
                 new OneRandomBehaviour<>(
                         new SetRandomLookTarget<>(),
+                        new SetPlayerLookTarget<>().startCondition(TodePiglinMerchant::seesPlayerHoldingLovedItem),
                         new SetRandomWalkTarget<>().speedModifier(SPEED_IDLE).stopIf(TodePiglinMerchant::stopWalking),
                         new Idle<>().runFor(entity -> entity.getRandom().nextInt(30, 60))
                 )
         );
     }
 
-
     @Override
     public BrainActivityGroup<TodePiglinMerchant> getFightTasks() {
         //noinspection unchecked
         return BrainActivityGroup.fightTasks(
-                new StopAttackingIfTargetInvalid<>((livingEntity) -> !isNearestValidAttackTarget(this)),
-                new InvalidateAttackTarget<>().invalidateIf(TodePiglinMerchant::isNearZombified).invalidateIf(TodePiglinMerchant::isAlly),
-                new MeleeAttack(MELEE_ATTACK_COOLDOWN),
-                new CrossbowAttack<>(),
-                new RunIf<>(TodePiglinMerchant::isHoldingCrossbow,
-                        new BackUpIfTooClose<>(MIN_DESIRED_DIST_FROM_TARGET_WHEN_HOLDING_CROSSBOW, SPEED_WHEN_STRAFING_BACK_FROM_TARGET)),
-                new SetWalkTargetFromAttackTargetIfTargetOutOfReach(1.0F),
-                new StrafeTarget<>().startCondition(TodePiglinMerchant::isHoldingCrossbow),
+                new InvalidateAttackTarget<>().invalidateIf((livingEntity, livingEntity1) -> !isNearestValidAttackTarget(this)),
+                new FirstApplicableBehaviour<>(
+                        new AnimatableMeleeAttack<>(MELEE_ATTACK_COOLDOWN)
+                                .whenStarting(entity -> setAggressive(true))
+                                .whenStopping(entity -> setAggressive(false)),
+                        new AnimatableRangedAttack<>(25)
+                                .startCondition(TodePiglinMerchant::isHoldingCrossbow)
+                                .whenStarting(entity -> setAggressive(true))
+                                .whenStopping(entity -> setAggressive(false)),
+                        new StrafeTarget<>().startCondition(TodePiglinMerchant::isHoldingCrossbow),
+                        new StayWithinDistanceOfAttackTarget<>()
+                                .minDistance(MIN_DESIRED_DIST_FROM_TARGET_WHEN_HOLDING_CROSSBOW)
+                                .startCondition(TodePiglinMerchant::isHoldingCrossbow)
+                ),
                 new RememberDeadHoglin()
         );
     }
@@ -751,20 +761,26 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
         data.addAnimationController(new AnimationController<>(this, "danceController",
                 0, this::dancePredicate));
     }
-    private <E extends IAnimatable> PlayState defaultPredicate(@NotNull AnimationEvent<E> event) {
+    private PlayState defaultPredicate(@NotNull AnimationEvent<TodePiglinMerchant> event) {
         if (event.isMoving()) {
-            event.getController().markNeedsReload();
-            event.getController().setAnimation(new AnimationBuilder().addAnimation("walk_legs_only", LOOP));
+            if (this.swinging) {
+                event.getController().markNeedsReload();
+                event.getController().setAnimation(new AnimationBuilder().addAnimation("walk_legs_only", LOOP));
+            }
+            else {
+                event.getController().markNeedsReload();
+                event.getController().setAnimation(new AnimationBuilder().addAnimation("walk", LOOP));
+            }
         }
-        else if (!event.isMoving()) {
+        else {
             event.getController().markNeedsReload();
             event.getController().setAnimation(new AnimationBuilder().addAnimation("idle", LOOP));
         }
         return PlayState.CONTINUE;
     }
-    private <E extends IAnimatable> PlayState meleePredicate(AnimationEvent<E> event) {
+    private PlayState meleePredicate(AnimationEvent<TodePiglinMerchant> event) {
         if (getArmPose() == TodePiglinMerchantArmPose.ATTACKING_WITH_MELEE_WEAPON) {
-            if (this.swinging && isAggressive() && event.getController().getAnimationState().equals(AnimationState.Stopped)) {
+            if (this.swinging && event.getController().getAnimationState().equals(AnimationState.Stopped)) {
                 if (isLeftHanded()) {
                     event.getController().markNeedsReload();
                     event.getController().setAnimation(new AnimationBuilder().addAnimation("melee_left", PLAY_ONCE));
@@ -776,7 +792,7 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
                     this.swinging = false;
                 }
             }
-            else if (!this.swinging && isAggressive() && event.getController().getAnimationState().equals(AnimationState.Stopped)) {
+            else if (!this.swinging && event.getController().getAnimationState().equals(AnimationState.Stopped)) {
                 if (isLeftHanded()) {
                     event.getController().markNeedsReload();
                     event.getController().setAnimation(new AnimationBuilder().addAnimation("melee_left", HOLD_ON_LAST_FRAME));
@@ -791,9 +807,9 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
         }
         return PlayState.CONTINUE;
     }
-    private <E extends IAnimatable> PlayState crossbowPredicate(AnimationEvent<E> event) {
+    private PlayState crossbowPredicate(AnimationEvent<TodePiglinMerchant> event) {
         if (getArmPose() == TodePiglinMerchantArmPose.CROSSBOW_CHARGE) {
-            if (this.swinging && isAggressive() && event.getController().getAnimationState().equals(AnimationState.Stopped)) {
+            if (this.swinging && event.getController().getAnimationState().equals(AnimationState.Stopped)) {
                 if (isLeftHanded()) {
                     event.getController().markNeedsReload();
                     event.getController().setAnimation(new AnimationBuilder().addAnimation("crossbow_left", HOLD_ON_LAST_FRAME));
@@ -810,8 +826,8 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
         }
         return PlayState.CONTINUE;
     }
-    private <E extends IAnimatable> PlayState admirePredicate(AnimationEvent<E> event) {
-        if (this.swingingArm == InteractionHand.OFF_HAND && getArmPose() == TodePiglinMerchantArmPose.ADMIRING_ITEM &&
+    private PlayState admirePredicate(AnimationEvent<TodePiglinMerchant> event) {
+        if (this.swinging && isHoldingItemInOffHand(event.getAnimatable()) && getArmPose() == TodePiglinMerchantArmPose.ADMIRING_ITEM &&
                 event.getController().getAnimationState().equals(AnimationState.Stopped)) {
             if (isLeftHanded()) {
                 event.getController().markNeedsReload();
@@ -826,9 +842,10 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
         }
         return PlayState.CONTINUE;
     }
-    private <E extends IAnimatable> PlayState dancePredicate(AnimationEvent<E> event) {
+    private PlayState dancePredicate(AnimationEvent<TodePiglinMerchant> event) {
         if (this.swinging && getArmPose() == TodePiglinMerchantArmPose.DANCING &&
                 event.getController().getAnimationState().equals(AnimationState.Stopped)) {
+            event.getController().markNeedsReload();
             event.getController().setAnimation(new AnimationBuilder().addAnimation("dance", LOOP));
             this.swinging = false;
         }
@@ -907,9 +924,13 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     }
 
     // targeting
-    public static boolean isAlly(LivingEntity livingEntity, LivingEntity livingEntity1) {
-        return livingEntity1 instanceof AbstractPiglin
-                || livingEntity1 instanceof TodePiglinMerchant;
+    public static boolean isAlly(LivingEntity livingEntity, LivingEntity checkedEntity) {
+        return checkedEntity instanceof AbstractPiglin;
+    }
+
+    private static boolean isNearestValidAttackTarget(LivingEntity livingEntity) {
+        TodePiglinMerchant todePiglinMerchant = (TodePiglinMerchant) livingEntity;
+        return isNearestValidAttackTarget(todePiglinMerchant);
     }
 
     private static boolean isNearestValidAttackTarget(TodePiglinMerchant todePiglinMerchant) {
