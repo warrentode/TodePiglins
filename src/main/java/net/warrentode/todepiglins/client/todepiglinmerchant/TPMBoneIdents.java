@@ -3,7 +3,6 @@ package net.warrentode.todepiglins.client.todepiglinmerchant;
 public class TPMBoneIdents {
     public static final String LEFT_HAND_BONE_IDENT = "bipedHandLeft";
     public static final String RIGHT_HAND_BONE_IDENT = "bipedHandRight";
-
     public static final String BODY_ARMOR_BONE_IDENT = "armorBipedBody";
     public static final String HEAD_ARMOR_BONE_IDENT = "armorBipedHead";
     public static final String LEFT_ARM_ARMOR_BONE_IDENT = "armorBipedLeftArm";

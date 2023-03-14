@@ -26,6 +26,8 @@ public class TodePiglinMerchantRenderer extends ExtendedGeoEntityRenderer<TodePi
     public TodePiglinMerchantRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new TodePiglinMerchantModel());
         this.shadowRadius = 0.6f;
+        this.widthScale = 1;
+        this.heightScale = 1;
     }
     @Override
     public RenderType getRenderType(TodePiglinMerchant animatable, float partialTick, PoseStack poseStack,

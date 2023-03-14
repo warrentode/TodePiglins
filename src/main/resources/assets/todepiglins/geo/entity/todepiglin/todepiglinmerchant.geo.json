@@ -7,7 +7,7 @@
 				"texture_width": 128,
 				"texture_height": 128,
 				"visible_bounds_width": 3,
-				"visible_bounds_height": 3,
+				"visible_bounds_height": 5,
 				"visible_bounds_offset": [0, 1.5, 0]
 			},
 			"bones": [
@@ -84,10 +84,33 @@
 					"rotation": [-6, 0, 0],
 					"cubes": [
 						{"origin": [-5, 15.90129, -4.63521], "size": [10, 8, 8], "inflate": -0.02, "pivot": [0, -9.09871, -3.63521], "rotation": [14.5, 0, 0], "uv": [0, 21]},
-						{"origin": [-5, 15.90129, -4.63521], "size": [10, 8, 8], "inflate": 0.25, "pivot": [0, -9.09871, -3.63521], "rotation": [14.5, 0, 0], "uv": [38, 0]},
-						{"origin": [-2, 15.90129, -5.63521], "size": [4, 4, 1], "pivot": [0, -9.09871, -3.63521], "rotation": [14.5, 0, 0], "uv": [12, 90]},
+						{"origin": [-5, 15.90129, -4.63521], "size": [10, 8, 8], "inflate": 0.25, "pivot": [0, -9.09871, -3.63521], "rotation": [14.5, 0, 0], "uv": [38, 0]}
+					]
+				},
+				{
+					"name": "headParticles",
+					"parent": "bipedHead",
+					"pivot": [0, 18.43095, -3.8759],
+					"cubes": [
+						{"origin": [0, 23.43095, -9.8759], "size": [0, 0, 0], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "noseBone",
+					"parent": "bipedHead",
+					"pivot": [0, 16.66571, -11.84769],
+					"cubes": [
+						{"origin": [-2, 14.66571, -12.34769], "size": [4, 4, 1], "pivot": [0, 16.66571, -11.84769], "rotation": [14.5, 0, 0], "uv": [12, 90]},
 						{"origin": [2, 15.90129, -5.63521], "size": [1, 2, 1], "pivot": [0, -9.09871, -3.63521], "rotation": [14.5, 0, 0], "uv": [16, 96]},
 						{"origin": [-3, 15.90129, -5.63521], "size": [1, 2, 1], "pivot": [0, -9.09871, -3.63521], "rotation": [14.5, 0, 0], "uv": [12, 96]}
+					]
+				},
+				{
+					"name": "noseParticles",
+					"parent": "noseBone",
+					"pivot": [0, 15.90129, -12.63521],
+					"cubes": [
+						{"origin": [0, 15.90129, -12.63521], "size": [0, 0, 0], "uv": [0, 0]}
 					]
 				},
 				{

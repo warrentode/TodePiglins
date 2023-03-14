@@ -10,7 +10,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.sensing.SensorType;
-import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -23,7 +22,7 @@ import net.warrentode.todepiglins.entity.custom.todepiglinmerchant.TodePiglinMer
 import net.warrentode.todepiglins.util.ModTags;
 import org.jetbrains.annotations.NotNull;
 
-public class TodePiglinBarterCurrencySensor <E extends LivingEntity> extends ExtendedSensor<E> {
+public class TodePiglinBarterCurrencySensor<E extends LivingEntity> extends ExtendedSensor<E> {
     private static final ImmutableList<MemoryModuleType<?>> MEMORIES =
             ImmutableList.of(
                     // vanilla memory types
@@ -89,13 +88,32 @@ public class TodePiglinBarterCurrencySensor <E extends LivingEntity> extends Ext
     // checks the held item being admired if it's tagged as barter currency
     public static void isBarterCurrency() {
         ItemStack stack = ItemStack.EMPTY;
-        if (stack.is(ModTags.Items.PIGLIN_BARTER_ITEMS)) {
-            stack.is(TodePiglinMerchant.BARTERING_ITEM);
-            stack.is(PiglinAi.BARTERING_ITEM);
-        } else if (stack.isPiglinCurrency()) {
-            stack.is(TodePiglinMerchant.BARTERING_ITEM);
-            stack.is(PiglinAi.BARTERING_ITEM);
-        }
+        stack.is(ModTags.Items.PIGLIN_BARTER_ITEMS);
+    }
+
+    public static boolean isLovedItem(@NotNull ItemStack stack) {
+        return stack.is(ItemTags.PIGLIN_LOVED);
+    }
+    public static boolean isWantedItem(@NotNull ItemStack stack) {
+        return stack.is(ItemTags.PIGLIN_LOVED) ||
+                stack.is(ItemTags.PIGLIN_FOOD) ||
+                stack.is(ModTags.Items.PIGLIN_BARTER_ITEMS);
+    }
+    public static boolean canAdmire(TodePiglinMerchant todePiglinMerchant, ItemStack stack) {
+        return !isAdmiringDisabled(todePiglinMerchant) && !isAdmiringItem(todePiglinMerchant)
+                && stack.is(ItemTags.PIGLIN_LOVED);
+    }
+    public static void admireItem(@NotNull TodePiglinMerchant todePiglinMerchant) {
+        BrainUtils.setForgettableMemory(todePiglinMerchant, MemoryModuleType.ADMIRING_ITEM, true, TodePiglinMerchant.ADMIRE_DURATION);
+    }
+    public static boolean isAdmiringDisabled(@NotNull TodePiglinMerchant todePiglinMerchant) {
+        return BrainUtils.hasMemory(todePiglinMerchant, MemoryModuleType.ADMIRING_DISABLED);
+    }
+    public static boolean isAdmiringItem(@NotNull TodePiglinMerchant todePiglinMerchant) {
+        return BrainUtils.hasMemory(todePiglinMerchant, MemoryModuleType.ADMIRING_ITEM);
+    }
+    public static boolean isNotHoldingWantedItemInOffHand(@NotNull TodePiglinMerchant todePiglinMerchant) {
+        return todePiglinMerchant.getOffhandItem().isEmpty() || !isWantedItem(todePiglinMerchant.getOffhandItem());
     }
 
     @Override

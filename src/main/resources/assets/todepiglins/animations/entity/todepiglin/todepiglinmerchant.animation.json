@@ -1,7 +1,7 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
-		"look_right": {
+		"look_left": {
 			"loop": true,
 			"animation_length": 2,
 			"bones": {
@@ -69,7 +69,7 @@
 				}
 			}
 		},
-		"look_left": {
+		"look_right": {
 			"loop": true,
 			"animation_length": 2,
 			"bones": {
@@ -1418,7 +1418,7 @@
 				}
 			}
 		},
-		"admire_left": {
+		"admire_right": {
 			"animation_length": 3,
 			"bones": {
 				"backpack": {
@@ -1846,7 +1846,7 @@
 			"particle_effects": {},
 			"timeline": {}
 		},
-		"admire_right": {
+		"admire_left": {
 			"animation_length": 3,
 			"bones": {
 				"backpack": {
@@ -2265,7 +2265,7 @@
 			"particle_effects": {},
 			"timeline": {}
 		},
-		"melee_left": {
+		"melee_right": {
 			"animation_length": 1,
 			"bones": {
 				"bipedHead": {
@@ -2421,7 +2421,7 @@
 				}
 			}
 		},
-		"melee_right": {
+		"melee_left": {
 			"animation_length": 1,
 			"bones": {
 				"backpack": {
@@ -4055,7 +4055,7 @@
 				}
 			}
 		},
-		"crossbow_left": {
+		"crossbow_right": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 3,
 			"bones": {
@@ -4484,7 +4484,7 @@
 				}
 			}
 		},
-		"crossbow_right": {
+		"crossbow_left": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 3,
 			"bones": {

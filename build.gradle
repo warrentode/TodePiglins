@@ -6,7 +6,7 @@ plugins {
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
-version = '1.19.2-0.0.2'
+version = '1.19.2-0.0.4'
 group = 'net.warrentode.todepiglins'
 archivesBaseName = 'todepiglins'
 
@@ -23,6 +23,7 @@ minecraft {
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', 'todepiglins'
+            property 'geckolib.disable_examples', 'true'
             mods {
                 todepiglins {
                     source sourceSets.main
@@ -35,6 +36,7 @@ minecraft {
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', 'todepiglins'
+            property 'geckolib.disable_examples', 'true'
             mods {
                 todepiglins {
                     source sourceSets.main
@@ -47,6 +49,7 @@ minecraft {
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', 'todepiglins'
+            property 'geckolib.disable_examples', 'true'
             mods {
                 todepiglins {
                     source sourceSets.main
@@ -58,6 +61,7 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
+            property 'geckolib.disable_examples', 'true'
             args '--mod', 'todepiglins', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
             mods {
                 todepiglins {

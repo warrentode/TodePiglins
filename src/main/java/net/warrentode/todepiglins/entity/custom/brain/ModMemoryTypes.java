@@ -14,22 +14,9 @@ public class ModMemoryTypes {
     @SuppressWarnings("EmptyMethod")
     public static void init() {}
 
-    private static Codec<TodePiglinMerchant> TodePiglinMerchant;
-
-    // Getter
-    public Codec<TodePiglinMerchant> getTodeAbstractPiglin(Codec<TodePiglinMerchant> TodePiglinMerchant) {
-        return TodePiglinMerchant;
-    }
-
-    // Setter
-    public Codec<TodePiglinMerchant> setTodeAbstractPiglin(Codec<TodePiglinMerchant> todePiglinMerchantCodec) {
-        return TodePiglinMerchant = todePiglinMerchantCodec;
-    }
-
-    @SuppressWarnings("ConstantValue")
-    public static final Supplier<MemoryModuleType<List<TodePiglinMerchant>>> NEARBY_ADULT_TODEPIGLINS = register("nearby_adult_todepiglins", Codec.list(TodePiglinMerchant));
-    public static final Supplier<MemoryModuleType<List<TodePiglinMerchant>>> NEAREST_VISIBLE_ADULT_TODEPIGLINS = register("nearest_visible_adult_todepiglins", Codec.list(TodePiglinMerchant));
-    public static final Supplier<MemoryModuleType<Integer>> VISIBLE_ADULT_TODEPIGLIN_COUNT = register("visible_adult_todepiglin_count", Codec.INT);
+    public static final Supplier<MemoryModuleType<List<TodePiglinMerchant>>> NEARBY_ADULT_TODEPIGLINS = register("nearby_adult_todepiglins");
+    public static final Supplier<MemoryModuleType<List<TodePiglinMerchant>>> NEAREST_VISIBLE_ADULT_TODEPIGLINS = register("nearest_visible_adult_todepiglins");
+    public static final Supplier<MemoryModuleType<Integer>> VISIBLE_ADULT_TODEPIGLIN_COUNT = register("visible_adult_todepiglin_count");
 
     private static <T> Supplier<MemoryModuleType<T>> register(String id) {
         return BrainLoader.registerMemoryType(id, null);

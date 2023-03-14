@@ -8,6 +8,8 @@ import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour;
 import net.warrentode.todepiglins.entity.custom.brain.ModMemoryTypes;
+import net.warrentode.todepiglins.entity.custom.brain.behaviors.SetAngerTarget;
+import net.warrentode.todepiglins.entity.custom.brain.sensors.TodePiglinSpecificSensor;
 import net.warrentode.todepiglins.entity.custom.todepiglinmerchant.TodePiglinMerchant;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,17 +24,25 @@ public class StartHoglinHunt extends ExtendedBehaviour<TodePiglinMerchant> {
                     Pair.of(ModMemoryTypes.NEAREST_VISIBLE_ADULT_TODEPIGLINS.get(), MemoryStatus.REGISTERED)
             );
 
+    protected static boolean hasAnyoneNearbyHuntedRecently(TodePiglinMerchant todePiglinMerchant) {
+        return todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.HUNTED_RECENTLY) ||
+                TodePiglinSpecificSensor.getVisibleAdultTodePiglins(todePiglinMerchant).stream().anyMatch((todePiglinMerchant1) ->
+                        todePiglinMerchant1.getBrain().hasMemoryValue(MemoryModuleType.HUNTED_RECENTLY)) ||
+                TodePiglinSpecificSensor.getVisibleAdultPiglins(todePiglinMerchant).stream().anyMatch((abstractPiglin) ->
+                        abstractPiglin.getBrain().hasMemoryValue(MemoryModuleType.HUNTED_RECENTLY));
+    }
+
     protected boolean checkExtraStartConditions(@NotNull ServerLevel pLevel, @NotNull TodePiglinMerchant todePiglinMerchant) {
-        return !TodePiglinMerchant.hasAnyoneNearbyHuntedRecently(todePiglinMerchant);
+        return !hasAnyoneNearbyHuntedRecently(todePiglinMerchant);
     }
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     protected void start(@NotNull ServerLevel pLevel, @NotNull TodePiglinMerchant todePiglinMerchant, long pGameTime) {
         Hoglin hoglin = todePiglinMerchant.getBrain().getMemory(MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN).get();
-        TodePiglinMerchant.setAngerTarget(todePiglinMerchant, hoglin);
-        TodePiglinMerchant.dontKillAnyMoreHoglinsForAWhile(todePiglinMerchant);
-        TodePiglinMerchant.broadcastAngerTarget(todePiglinMerchant, hoglin);
-        TodePiglinMerchant.broadcastDontKillAnyMoreHoglinsForAWhile(todePiglinMerchant);
+        SetAngerTarget.setAngerTarget(todePiglinMerchant, hoglin);
+        SetAngerTarget.dontKillAnyMoreHoglinsForAWhile(todePiglinMerchant);
+        SetAngerTarget.broadcastAngerTarget(todePiglinMerchant, hoglin);
+        SetAngerTarget.broadcastDontKillAnyMoreHoglinsForAWhile(todePiglinMerchant);
     }
     @Override
     protected List<Pair<MemoryModuleType<?>, MemoryStatus>> getMemoryRequirements() {

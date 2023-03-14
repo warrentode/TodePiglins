@@ -7,6 +7,7 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour;
+import net.warrentode.todepiglins.entity.custom.brain.sensors.TodePiglinBarterCurrencySensor;
 import net.warrentode.todepiglins.entity.custom.todepiglinmerchant.TodePiglinMerchant;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,6 +17,7 @@ public class StartAdmiring extends ExtendedBehaviour<TodePiglinMerchant> {
     private final int admireDuration;
     private static final List<Pair<MemoryModuleType<?>, MemoryStatus>> MEMORY_REQUIREMENTS =
             ObjectArrayList.of(
+                    Pair.of(MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM, MemoryStatus.VALUE_PRESENT),
                     Pair.of(MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM, MemoryStatus.VALUE_PRESENT),
                     Pair.of(MemoryModuleType.ADMIRING_ITEM, MemoryStatus.VALUE_ABSENT),
                     Pair.of(MemoryModuleType.ADMIRING_DISABLED, MemoryStatus.VALUE_ABSENT),
@@ -28,8 +30,8 @@ public class StartAdmiring extends ExtendedBehaviour<TodePiglinMerchant> {
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     protected boolean checkExtraStartConditions(@NotNull ServerLevel pLevel, @NotNull TodePiglinMerchant todePiglinMerchant) {
-        ItemEntity itementity = todePiglinMerchant.getBrain().getMemory(MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM).get();
-        return TodePiglinMerchant.isLovedItem(itementity.getItem());
+        ItemEntity itemEntity = todePiglinMerchant.getBrain().getMemory(MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM).get();
+        return TodePiglinBarterCurrencySensor.isLovedItem(itemEntity.getItem());
     }
 
     protected void start(@NotNull ServerLevel pLevel, @NotNull TodePiglinMerchant todePiglinMerchant, long pGameTime) {
