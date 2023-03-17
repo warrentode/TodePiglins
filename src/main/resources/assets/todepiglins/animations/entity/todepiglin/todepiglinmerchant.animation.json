@@ -2265,7 +2265,7 @@
 			"particle_effects": {},
 			"timeline": {}
 		},
-		"melee_right": {
+		"melee_left": {
 			"animation_length": 1,
 			"bones": {
 				"bipedHead": {
@@ -2421,7 +2421,7 @@
 				}
 			}
 		},
-		"melee_left": {
+		"melee_right": {
 			"animation_length": 1,
 			"bones": {
 				"backpack": {

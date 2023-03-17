@@ -3,7 +3,6 @@ package net.warrentode.todepiglins.entity.custom.todepiglinmerchant;
 import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -12,7 +11,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.VisibleForDebug;
@@ -42,9 +40,10 @@ import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.npc.InventoryCarrier;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.schedule.Activity;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
@@ -66,22 +65,23 @@ import net.tslat.smartbrainlib.api.core.SmartBrainProvider;
 import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableRangedAttack;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.look.LookAtTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.AvoidEntity;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.MoveToWalkTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.StayWithinDistanceOfAttackTarget;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.move.StrafeTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetRandomWalkTarget;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.target.*;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetWalkTargetToAttackTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.target.InvalidateAttackTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetPlayerLookTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetRandomLookTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.target.TargetOrRetaliate;
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
 import net.tslat.smartbrainlib.api.core.sensor.custom.NearbyBlocksSensor;
 import net.tslat.smartbrainlib.api.core.sensor.custom.UnreachableTargetSensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.HurtBySensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyLivingEntitySensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyPlayersSensor;
-import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearestItemSensor;
 import net.tslat.smartbrainlib.util.BrainUtils;
 import net.warrentode.todepiglins.client.todepiglinmerchant.TodePiglinMerchantArmPose;
 import net.warrentode.todepiglins.entity.custom.brain.behaviors.EatFood;
@@ -92,8 +92,8 @@ import net.warrentode.todepiglins.entity.custom.brain.behaviors.bartering.StopAd
 import net.warrentode.todepiglins.entity.custom.brain.behaviors.bartering.StopHoldingAndBarter;
 import net.warrentode.todepiglins.entity.custom.brain.behaviors.hunting.RememberDeadHoglin;
 import net.warrentode.todepiglins.entity.custom.brain.behaviors.hunting.StartCelebrating;
-import net.warrentode.todepiglins.entity.custom.brain.behaviors.hunting.StartHoglinHunt;
 import net.warrentode.todepiglins.entity.custom.brain.behaviors.hunting.StopAngerUponDeadTarget;
+import net.warrentode.todepiglins.entity.custom.brain.sensors.NearestWantedItemSensor;
 import net.warrentode.todepiglins.entity.custom.brain.sensors.TodePiglinBarterCurrencySensor;
 import net.warrentode.todepiglins.entity.custom.brain.sensors.TodePiglinSpecificSensor;
 import net.warrentode.todepiglins.util.ModTags;
@@ -111,23 +111,18 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 import javax.annotation.Nullable;
 import java.util.*;
 
-import static software.bernie.geckolib3.core.builder.ILoopType.EDefaultLoopTypes.LOOP;
-import static software.bernie.geckolib3.core.builder.ILoopType.EDefaultLoopTypes.PLAY_ONCE;
+import static software.bernie.geckolib3.core.builder.ILoopType.EDefaultLoopTypes.*;
 
-public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodePiglinMerchant>, IAnimatable, CrossbowAttackMob, InventoryCarrier {
-    private static final EntityDataAccessor<Boolean> DATA_IS_CHARGING_CROSSBOW =
-            SynchedEntityData.defineId(TodePiglinMerchant.class, EntityDataSerializers.BOOLEAN);
+public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodePiglinMerchant>, IAnimatable, InventoryCarrier {
     private static final EntityDataAccessor<Boolean> DATA_IS_DANCING =
             SynchedEntityData.defineId(TodePiglinMerchant.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_CANNOT_HUNT =
             SynchedEntityData.defineId(TodePiglinMerchant.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Boolean> DATA_YES_NOD =
-            SynchedEntityData.defineId(TodePiglinMerchant.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Boolean> DATA_NO_NOD =
-            SynchedEntityData.defineId(TodePiglinMerchant.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_WILLING_TO_BARTER =
             SynchedEntityData.defineId(TodePiglinMerchant.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_HOLDING_ITEM =
+            SynchedEntityData.defineId(TodePiglinMerchant.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DATA_CAN_WALK =
             SynchedEntityData.defineId(TodePiglinMerchant.class, EntityDataSerializers.BOOLEAN);
     public static final UniformInt TIME_BETWEEN_HUNTS = TimeUtil.rangeOfSeconds(30, 120);
     public static final UniformInt RETREAT_DURATION = TimeUtil.rangeOfSeconds(5, 20);
@@ -136,10 +131,8 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     private static final double KNOCKBACK_RESISTANCE = 1;
     private static final int MELEE_ATTACK_COOLDOWN = 20;
     private static final double ATTACK_DAMAGE = 7.0D;
-    private static final float CROSSBOW_POWER = 1.6F;
-    private static final int MIN_DESIRED_DIST_FROM_TARGET_WHEN_HOLDING_CROSSBOW = 5;
     private static final float CHANCE_OF_WEARING_EACH_ARMOUR_ITEM = 0.1F;
-    private static final double PROBABILITY_OF_SPAWNING_WITH_CROSSBOW_INSTEAD_OF_SWORD = 0.5D;
+    private static final double PROBABILITY_OF_SPAWNING_WITH_AXE_INSTEAD_OF_SWORD = 0.5D;
     public static final int DESIRED_DISTANCE_FROM_REPELLENT = 8;
     public static final int REPELLENT_DETECTION_RANGE_HORIZONTAL = 8;
     public static final int REPELLENT_DETECTION_RANGE_VERTICAL = 4;
@@ -184,13 +177,11 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     // synced data management
     protected void defineSynchedData() {
         super.defineSynchedData();
-        this.entityData.define(DATA_IS_CHARGING_CROSSBOW, false);
         this.entityData.define(DATA_CANNOT_HUNT, false);
         this.entityData.define(DATA_IS_DANCING, false);
-        this.entityData.define(DATA_YES_NOD, false);
-        this.entityData.define(DATA_NO_NOD, false);
         this.entityData.define(DATA_WILLING_TO_BARTER, true);
         this.entityData.define(DATA_HOLDING_ITEM, false);
+        this.entityData.define(DATA_CAN_WALK, true);
     }
     public void onSyncedDataUpdated(@NotNull EntityDataAccessor<?> pKey) {
         super.onSyncedDataUpdated(pKey);
@@ -251,8 +242,8 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
         this.inventory.removeAllItems().forEach(this::spawnAtLocation);
     }
     private @NotNull ItemStack createSpawnWeapon() {
-        return (double)this.random.nextFloat() < PROBABILITY_OF_SPAWNING_WITH_CROSSBOW_INSTEAD_OF_SWORD ?
-                new ItemStack(Items.CROSSBOW) : new ItemStack(Items.GOLDEN_SWORD);
+        return (double)this.random.nextFloat() < PROBABILITY_OF_SPAWNING_WITH_AXE_INSTEAD_OF_SWORD ?
+                new ItemStack(Items.GOLDEN_AXE) : new ItemStack(Items.GOLDEN_SWORD);
     }
     protected void populateDefaultEquipmentSlots(@NotNull RandomSource pRandom, @NotNull DifficultyInstance pDifficulty) {
         this.maybeWearArmor(EquipmentSlot.HEAD, new ItemStack(Items.GOLDEN_HELMET), pRandom);
@@ -280,20 +271,6 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     public boolean isDancing() {
         return this.entityData.get(DATA_IS_DANCING);
     }
-    // yesNod  switch
-    public void setDataYesNod(boolean pYesNod) {
-        this.entityData.set(DATA_YES_NOD, pYesNod);
-    }
-    public boolean canYesNod() {
-        return !this.entityData.get(DATA_YES_NOD);
-    }
-    // noNod  switch
-    public void setDataNoNod(boolean pNoNod) {
-        this.entityData.set(DATA_NO_NOD, pNoNod);
-    }
-    public boolean canNoNod() {
-        return !this.entityData.get(DATA_NO_NOD);
-    }
     // barter  switch
     public void setWillingToBarter(boolean pWillingToBarter) {
         this.entityData.set(DATA_WILLING_TO_BARTER, pWillingToBarter);
@@ -301,12 +278,19 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     public boolean isWillingToBarter() {
         return !this.entityData.get(DATA_WILLING_TO_BARTER);
     }
-    // barter  switch
+    // holding  switch
     public void setHoldingItem(boolean pHoldingItem) {
         this.entityData.set(DATA_HOLDING_ITEM, pHoldingItem);
     }
     public boolean isHoldingItem() {
-        return !this.entityData.get(DATA_HOLDING_ITEM);
+        return this.entityData.get(DATA_HOLDING_ITEM);
+    }
+    // walk  switch
+    public void setCanWalk(boolean pCanWalk) {
+        this.entityData.set(DATA_CAN_WALK, pCanWalk);
+    }
+    public boolean canWalk() {
+        return this.entityData.get(DATA_CAN_WALK);
     }
 
     // inventory management
@@ -349,7 +333,7 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
                                         target instanceof TodePiglinMerchant),
                 new NearbyPlayersSensor<>(),
                 new NearbyBlocksSensor<>(),
-                new NearestItemSensor<TodePiglinMerchant>().setPredicate(TodePiglinMerchant::wantsItemOnGround),
+                new NearestWantedItemSensor<>(),
                 new HurtBySensor<>(),
                 new UnreachableTargetSensor<>(),
                 new TodePiglinBarterCurrencySensor<>(TodePiglinMerchant.getBarterItems()),
@@ -388,46 +372,53 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     }
     @Override
     public BrainActivityGroup<TodePiglinMerchant> getIdleTasks() {
-        //noinspection unchecked
+        // noinspection unchecked
         return BrainActivityGroup.idleTasks(
                 new FirstApplicableBehaviour<>(
                         new SetAngerTarget(),
-                        new SetAttackTarget<>()
-                                .targetFinder(TodePiglinSpecificSensor::findNearestValidAttackTarget),
                         new TargetOrRetaliate<>()
+                                .attackablePredicate((target)->
+                                        !(target instanceof TodePiglinMerchant) &&
+                                                !(target instanceof AbstractPiglin) &&
+                                                !(target instanceof Zombie) &&
+                                                !(target instanceof ZombieHorse) &&
+                                                !(target instanceof Zoglin) &&
+                                                !(target.isBaby())
+                                )
+                                .useMemory(MemoryModuleType.HURT_BY_ENTITY)
+                                .useMemory(MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD)
+                                .useMemory(MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN)
+                                .useMemory(MemoryModuleType.NEAREST_VISIBLE_NEMESIS)
                                 .isAllyIf(TodePiglinSpecificSensor::isAlliedTo)
-                                .alertAlliesWhen((mob, entity) -> wasHurtBy(this, (LivingEntity) entity))
-                                .useMemory(MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD),
-                        new StartHoglinHunt().startCondition(TodePiglinMerchant::canHunt),
-                        new SetPlayerLookTarget<>().predicate(TodePiglinSpecificSensor::isPlayerHoldingLovedItem)
+                                .alertAlliesWhen((mob, entity) ->
+                                        entity instanceof Hoglin ||
+                                                entity instanceof Player ||
+                                                entity instanceof WitherSkeleton),
+                        new SetPlayerLookTarget<>()
+                                .predicate(TodePiglinSpecificSensor::isPlayerHoldingLovedItem)
                 ),
                 new OneRandomBehaviour<>(
                         new SetRandomLookTarget<>(),
-                        new SetRandomWalkTarget<>().speedModifier(SPEED_IDLE).stopIf(TodePiglinMerchant::stopWalking),
+                        new SetRandomWalkTarget<>()
+                                .speedModifier(SPEED_IDLE).stopIf(TodePiglinMerchant::isHoldingItemInOffHand),
                         new Idle<>().runFor(entity -> entity.getRandom().nextInt(30, 60))
-                )
+                ).startCondition(pathfinderMob -> canWalk())
         );
     }
+
     @Override
     public BrainActivityGroup<TodePiglinMerchant> getFightTasks() {
         //noinspection unchecked
         return BrainActivityGroup.fightTasks(
-                new InvalidateAttackTarget<>().invalidateIf((livingEntity, livingEntity1) ->
-                        !TodePiglinSpecificSensor.isNearestValidAttackTarget(this)),
+                new InvalidateAttackTarget<>(),
+                new RememberDeadHoglin(),
+                new SetWalkTargetToAttackTarget<>(),
                 new FirstApplicableBehaviour<>(
                         new AnimatableMeleeAttack<>(MELEE_ATTACK_COOLDOWN)
                                 .whenStarting(entity -> setAggressive(true))
                                 .whenStopping(entity -> setAggressive(false)),
-                        new AnimatableRangedAttack<>(25)
-                                .startCondition(TodePiglinMerchant::isHoldingCrossbow)
-                                .whenStarting(entity -> setAggressive(true))
-                                .whenStopping(entity -> setAggressive(false)),
-                        new StrafeTarget<>().startCondition(TodePiglinMerchant::isHoldingCrossbow),
-                        new StayWithinDistanceOfAttackTarget<>()
-                                .minDistance(MIN_DESIRED_DIST_FROM_TARGET_WHEN_HOLDING_CROSSBOW)
-                                .startCondition(TodePiglinMerchant::isHoldingCrossbow)
-                ),
-                new RememberDeadHoglin()
+                        new StayWithinDistanceOfAttackTarget<>().minDistance(1f).maxDistance(5f)
+                )
         );
     }
 
@@ -449,19 +440,27 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     protected void customServerAiStep() {
         if (!BrainUtils.hasMemory(this.brain, MemoryModuleType.CELEBRATE_LOCATION)) {
             BrainUtils.setMemory(this.brain, MemoryModuleType.DANCING, false);
-            setWillingToBarter(true);
-        } else {
+            setDancing(false);
+        }
+        else {
             BrainUtils.setMemory(this.brain, MemoryModuleType.DANCING, true);
-            setWillingToBarter(false);
+            setDancing(true);
         }
 
         if (this.entityData.get(DATA_CANNOT_HUNT) && !BrainUtils.hasMemory(this.brain, MemoryModuleType.HUNTED_RECENTLY)) {
             BrainUtils.setForgettableMemory(this,
                     MemoryModuleType.HUNTED_RECENTLY, true, TIME_BETWEEN_HUNTS.sample(this.level.random));
-        } else {
+        }
+        else {
             setCannotHunt(true);
             BrainUtils.clearMemory(this.brain, MemoryModuleType.HUNTED_RECENTLY);
         }
+
+        setWillingToBarter(!isDancing());
+
+        setHoldingItem(this.getItemInHand(InteractionHand.OFF_HAND) != ItemStack.EMPTY);
+
+        setCanWalk(!isHoldingItem());
 
         updateSwingTime();
         // must be here to tick the brain server side //
@@ -504,8 +503,6 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
                 0, this::defaultPredicate));
         data.addAnimationController(new AnimationController<>(this, "meleeController",
                 0, this::meleePredicate));
-        data.addAnimationController(new AnimationController<>(this, "crossbowController",
-                0, this::crossbowPredicate));
         data.addAnimationController(new AnimationController<>(this, "admireController",
                 0, this::admirePredicate));
         data.addAnimationController(new AnimationController<>(this, "danceController",
@@ -526,77 +523,31 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
         }
         return PlayState.CONTINUE;
     }
-    private PlayState meleePredicate(AnimationEvent<TodePiglinMerchant> event) {
-        if (getArmPose() == TodePiglinMerchantArmPose.ATTACKING_WITH_MELEE_WEAPON) {
-            if (this.swinging && event.getController().getAnimationState().equals(AnimationState.Stopped)) {
-                if (isLeftHanded()) {
-                    event.getController().markNeedsReload();
-                    event.getController().setAnimation(new AnimationBuilder().addAnimation("melee_left", PLAY_ONCE));
-                    this.swinging = false;
-                }
-                else if (!isLeftHanded()) {
-                    event.getController().markNeedsReload();
-                    event.getController().setAnimation(new AnimationBuilder().addAnimation("melee_right", PLAY_ONCE));
-                    this.swinging = false;
-                }
-            }
-        }
-        return PlayState.CONTINUE;
-    }
-    private PlayState crossbowPredicate(AnimationEvent<TodePiglinMerchant> event) {
-        if (getArmPose() == TodePiglinMerchantArmPose.CROSSBOW_CHARGE) {
-            if (this.swinging && event.getController().getAnimationState().equals(AnimationState.Stopped)) {
-                if (isLeftHanded()) {
-                    event.getController().markNeedsReload();
-                    event.getController().setAnimation(new AnimationBuilder().addAnimation("crossbow_left", PLAY_ONCE));
-                    this.swinging = false;
-                } else if (!isLeftHanded()) {
-                    event.getController().markNeedsReload();
-                    event.getController().setAnimation(new AnimationBuilder().addAnimation("crossbow_right", PLAY_ONCE));
-                    this.swinging = false;
-                }
-            }
-            else if (getArmPose() == TodePiglinMerchantArmPose.CROSSBOW_HOLD) {
-                event.getController().markNeedsReload();
-                event.getController().setAnimation(new AnimationBuilder().addAnimation("walk", LOOP));
-            }
-        }
-        return PlayState.CONTINUE;
-    }
     private PlayState admirePredicate(AnimationEvent<TodePiglinMerchant> event) {
-        if (this.swinging && isHoldingItem() && getArmPose() == TodePiglinMerchantArmPose.ADMIRING_ITEM &&
+        if (this.swinging && getArmPose() == TodePiglinMerchantArmPose.ACCEPT_ITEM &&
                 event.getController().getAnimationState().equals(AnimationState.Stopped)) {
             if (isLeftHanded()) {
-                if (EatFood.eat(event.getAnimatable())) {
-                    ItemStack handItemStack = this.getItemInHand(InteractionHand.OFF_HAND);
-                    if (handItemStack.getItem().getUseAnimation(handItemStack) == UseAnim.EAT) {
-                        event.getController().markNeedsReload();
-                        event.getController().setAnimation(new AnimationBuilder().addAnimation("admire_left", LOOP));
-                    }
-                }
                 event.getController().markNeedsReload();
-                event.getController().setAnimation(new AnimationBuilder().addAnimation("admire_left", PLAY_ONCE));
+                event.getController().setAnimation(new AnimationBuilder().addAnimation("admire_left", PLAY_ONCE)
+                        .addRepeatingAnimation("nod_yes", 4));
             }
             else if (!isLeftHanded()) {
-                if (EatFood.eat(event.getAnimatable())) {
-                    ItemStack handItemStack = this.getItemInHand(InteractionHand.OFF_HAND);
-                    if (handItemStack.getItem().getUseAnimation(handItemStack) == UseAnim.EAT) {
-                        event.getController().markNeedsReload();
-                        event.getController().setAnimation(new AnimationBuilder().addAnimation("admire_right", LOOP));
-                    }
-                }
                 event.getController().markNeedsReload();
-                event.getController().setAnimation(new AnimationBuilder().addAnimation("admire_right", PLAY_ONCE));
+                event.getController().setAnimation(new AnimationBuilder().addAnimation("admire_right", PLAY_ONCE)
+                        .addRepeatingAnimation("nod_yes", 4));
             }
-            else if (canYesNod()) {
+        }
+        if (this.swinging && getArmPose() == TodePiglinMerchantArmPose.REJECT_ITEM &&
+                event.getController().getAnimationState().equals(AnimationState.Stopped)) {
+            if (isLeftHanded()) {
                 event.getController().markNeedsReload();
-                event.getController().setAnimation(new AnimationBuilder().addRepeatingAnimation("nod_yes", 6));
-                setDataYesNod(false);
+                event.getController().setAnimation(new AnimationBuilder().addAnimation("admire_left", PLAY_ONCE)
+                        .addRepeatingAnimation("nod_no", 4));
             }
-            else if (canNoNod()) {
+            else if (!isLeftHanded()) {
                 event.getController().markNeedsReload();
-                event.getController().setAnimation(new AnimationBuilder().addRepeatingAnimation("nod_no", 6));
-                setDataNoNod(false);
+                event.getController().setAnimation(new AnimationBuilder().addAnimation("admire_right", PLAY_ONCE)
+                        .addRepeatingAnimation("nod_no", 4));
             }
         }
         return PlayState.CONTINUE;
@@ -606,7 +557,21 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
                 event.getController().getAnimationState().equals(AnimationState.Stopped)) {
             event.getController().markNeedsReload();
             event.getController().setAnimation(new AnimationBuilder().addAnimation("dance", LOOP));
-            this.swinging = false;
+        }
+        return PlayState.CONTINUE;
+    }
+    private PlayState meleePredicate(AnimationEvent<TodePiglinMerchant> event) {
+        if (getArmPose() == TodePiglinMerchantArmPose.ATTACKING_WITH_MELEE_WEAPON) {
+            if (this.swinging && event.getController().getAnimationState().equals(AnimationState.Stopped)) {
+                if (isLeftHanded()) {
+                    event.getController().markNeedsReload();
+                    event.getController().setAnimation(new AnimationBuilder().addAnimation("melee_left", HOLD_ON_LAST_FRAME));
+                }
+                else if (!isLeftHanded()) {
+                    event.getController().markNeedsReload();
+                    event.getController().setAnimation(new AnimationBuilder().addAnimation("melee_right", HOLD_ON_LAST_FRAME));
+                }
+            }
         }
         return PlayState.CONTINUE;
     }
@@ -615,18 +580,17 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
         if (this.isDancing()) {
             return TodePiglinMerchantArmPose.DANCING;
         }
-        else if (TodePiglinBarterCurrencySensor.isWantedItem(this.getOffhandItem())) {
-            return TodePiglinMerchantArmPose.ADMIRING_ITEM;
+        else if (isHoldingItemInOffHand(this) && ItemStack.EMPTY.is(ModTags.Items.PIGLIN_BARTER_ITEMS)) {
+            return TodePiglinMerchantArmPose.ACCEPT_ITEM;
+        }
+        else if (isHoldingItemInOffHand(this) && !ItemStack.EMPTY.is(ModTags.Items.PIGLIN_BARTER_ITEMS)) {
+            return TodePiglinMerchantArmPose.REJECT_ITEM;
         }
         else if (this.isAggressive() && this.isHoldingMeleeWeapon()) {
             return TodePiglinMerchantArmPose.ATTACKING_WITH_MELEE_WEAPON;
         }
-        else if (this.isChargingCrossbow()) {
-            return TodePiglinMerchantArmPose.CROSSBOW_CHARGE;
-        }
         else {
-            return this.isAggressive() && this.isHolding(is -> is.getItem() instanceof CrossbowItem) ?
-                    TodePiglinMerchantArmPose.CROSSBOW_HOLD : TodePiglinMerchantArmPose.DEFAULT;
+            return TodePiglinMerchantArmPose.DEFAULT;
         }
     }
 
@@ -634,45 +598,18 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     protected boolean isHoldingMeleeWeapon() {
         return this.getMainHandItem().getItem() instanceof TieredItem;
     }
-    // crossbow specific logistics
-    private static boolean isHoldingCrossbow(@NotNull LivingEntity livingEntity) {
-        return livingEntity.isHolding(stack -> stack.getItem() instanceof CrossbowItem);
-    }
-    @Override
-    public void setChargingCrossbow(boolean isCharging) {
-        this.entityData.set(DATA_IS_CHARGING_CROSSBOW, isCharging);
-    }
-    private boolean isChargingCrossbow() {
-        return this.entityData.get(DATA_IS_CHARGING_CROSSBOW);
-    }
-    @Override
-    public boolean canFireProjectileWeapon(@NotNull ProjectileWeaponItem pProjectileWeapon) {
-        return pProjectileWeapon == Items.CROSSBOW;
-    }
-    @Override
-    public void shootCrossbowProjectile(@NotNull LivingEntity target, @NotNull ItemStack crossbowStack, @NotNull Projectile bolt, float boltAngle) {
-        this.shootCrossbowProjectile(this, target, bolt, boltAngle, CROSSBOW_POWER);
-    }
-    @Override
-    public void onCrossbowAttackPerformed() {
-        this.noActionTime = 0;
-    }
-    @Override
-    public void performRangedAttack(@NotNull LivingEntity target, float pVelocity) {
-        this.performCrossbowAttack(this, CROSSBOW_POWER);
-    }
     private static boolean isHoldingItemInOffHand(@NotNull LivingEntity livingEntity) {
         return !livingEntity.getOffhandItem().isEmpty();
     }
 
-    /** INSTRUCTIONS FOR THE BRAIN (AI bits) **/
-    private static boolean stopWalking(PathfinderMob pathfinderMob) {
+    /**
+     * INSTRUCTIONS FOR THE BRAIN (AI bits)
+     **/
+    private static void stopWalking(PathfinderMob pathfinderMob) {
         if (isHoldingItemInOffHand(pathfinderMob)) {
             BrainUtils.clearMemory(pathfinderMob, MemoryModuleType.WALK_TARGET);
             pathfinderMob.getNavigation().stop();
-            return true;
         }
-        return false;
     }
     public static boolean isIdle(@NotNull TodePiglinMerchant todePiglinMerchant) {
         return todePiglinMerchant.getBrain().isActive(Activity.IDLE);
@@ -700,7 +637,7 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
             ItemStack itemstack = player.getItemInHand(hand);
             if (TodePiglinBarterCurrencySensor.canAdmire(this, itemstack)) {
                 ItemStack itemstack1 = itemstack.split(1);
-                holdingInOffhand(this, itemstack1);
+                holdInOffhand(this, itemstack1);
                 TodePiglinBarterCurrencySensor.admireItem(this);
                 stopWalking(this);
                 setHoldingItem(true);
@@ -715,14 +652,19 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
             //may need to come back to edit this for barter currency specifically?
             boolean flag = TodePiglinBarterCurrencySensor.canAdmire(this, player.getItemInHand(hand)) &&
                     !TodePiglinBarterCurrencySensor.isWantedItem(this.getOffhandItem()) && !this.isDancing() &&
-                    (this.getArmPose() != TodePiglinMerchantArmPose.ADMIRING_ITEM);
+                    isWillingToBarter();
             return flag ? InteractionResult.SUCCESS : InteractionResult.PASS;
         }
     }
 
-    private static void holdingInOffhand(@NotNull TodePiglinMerchant todePiglinMerchant, @NotNull ItemStack stack) {
+    protected void holdInMainHand(ItemStack pStack) {
+        this.setItemSlotAndDropWhenKilled(EquipmentSlot.MAINHAND, pStack);
+    }
+
+    private static void holdInOffhand(@NotNull TodePiglinMerchant todePiglinMerchant, @NotNull ItemStack stack) {
         todePiglinMerchant.spawnAtLocation(todePiglinMerchant.getItemInHand(InteractionHand.OFF_HAND));
         if (stack.is(ItemTags.PIGLIN_LOVED) || stack.is(ItemTags.PIGLIN_FOOD)) {
+            todePiglinMerchant.setItemInHand(InteractionHand.OFF_HAND, stack);
             todePiglinMerchant.setItemSlot(EquipmentSlot.OFFHAND, stack);
             todePiglinMerchant.setGuaranteedDrop(EquipmentSlot.OFFHAND);
         } else {
@@ -739,37 +681,36 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
         }
         return stack1;
     }
-    private static boolean wantsItemOnGround(ItemEntity itemEntity, TodePiglinMerchant todePiglinMerchant) {
-        return ForgeEventFactory.getMobGriefingEvent(todePiglinMerchant.level, todePiglinMerchant) &&
-                todePiglinMerchant.canPickUpLoot() && wantsToPickUp(itemEntity, todePiglinMerchant);
+
+    public boolean wantsToPickUp(@NotNull ItemStack stack) {
+        return ForgeEventFactory.getMobGriefingEvent(this.level, this) && this.canPickUpLoot() && wantsToPickUp(stack, this);
     }
-    private static boolean wantsToPickUp(@NotNull ItemEntity itemEntity, @NotNull TodePiglinMerchant todePiglinMerchant) {
-        if (!todePiglinMerchant.isDancing()) {
-            ItemStack stack = itemEntity.getItem();
-            if (stack.is(ItemTags.PIGLIN_REPELLENTS)) {
-                return false;
+    private static boolean wantsToPickUp(@NotNull ItemStack stack, @NotNull TodePiglinMerchant todePiglinMerchant) {
+        if (stack.is(ItemTags.PIGLIN_REPELLENTS)) {
+            return false;
+        }
+        else if (TodePiglinBarterCurrencySensor.isAdmiringDisabled(todePiglinMerchant)
+                && todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.ATTACK_TARGET)) {
+            return false;
+        }
+        else if (TodePiglinBarterCurrencySensor.isWantedItem(stack) && todePiglinMerchant.isWillingToBarter()) {
+            return TodePiglinBarterCurrencySensor.isNotHoldingWantedItemInOffHand(todePiglinMerchant);
+        }
+        else {
+            boolean flag = todePiglinMerchant.canAddToInventory(stack);
+            if (stack.is(Items.GOLD_NUGGET)) {
+                return flag;
             }
-            else if (TodePiglinBarterCurrencySensor.isAdmiringDisabled(todePiglinMerchant)
-                    && todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.ATTACK_TARGET)) {
-                return false;
+            else if (EatFood.isFood(stack)) {
+                return EatFood.hasEatenRecently(todePiglinMerchant) && flag;
             }
-            else if (TodePiglinBarterCurrencySensor.isWantedItem(stack) && todePiglinMerchant.isWillingToBarter()) {
-                return TodePiglinBarterCurrencySensor.isNotHoldingWantedItemInOffHand(todePiglinMerchant);
+            else if (!TodePiglinBarterCurrencySensor.isLovedItem(stack)) {
+                return todePiglinMerchant.canReplaceCurrentItem(stack);
             }
             else {
-                boolean flag = todePiglinMerchant.canAddToInventory(stack);
-                if (stack.is(Items.GOLD_NUGGET)) {
-                    return flag;
-                } else if (EatFood.isFood(stack)) {
-                    return EatFood.hasEatenRecently(todePiglinMerchant) && flag;
-                } else if (!TodePiglinBarterCurrencySensor.isLovedItem(stack)) {
-                    return todePiglinMerchant.canReplaceCurrentItem(stack);
-                } else {
-                    return TodePiglinBarterCurrencySensor.isNotHoldingWantedItemInOffHand(todePiglinMerchant) && flag;
-                }
+                return TodePiglinBarterCurrencySensor.isNotHoldingWantedItemInOffHand(todePiglinMerchant) && flag;
             }
         }
-        return false;
     }
 
     /** "item shuffle" as the entity examines what it has in hand and decides what to do with it **/
@@ -782,49 +723,51 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
         if (EnchantmentHelper.hasBindingCurse(pExisting)) {
             return false;
         } else {
-            boolean flag = TodePiglinBarterCurrencySensor.isLovedItem(pCandidate) || pCandidate.is(Items.CROSSBOW);
-            boolean flag1 = TodePiglinBarterCurrencySensor.isLovedItem(pExisting) || pExisting.is(Items.CROSSBOW);
+            boolean flag = TodePiglinBarterCurrencySensor.isLovedItem(pCandidate) || pCandidate.is(Items.GOLDEN_AXE);
+            boolean flag1 = TodePiglinBarterCurrencySensor.isLovedItem(pExisting) || pExisting.is(Items.GOLDEN_AXE);
             if (flag && !flag1) {
                 return true;
             } else if (!flag && flag1) {
                 return false;
             } else {
-                return (pCandidate.is(Items.CROSSBOW) || !pExisting.is(Items.CROSSBOW)) &&
+                return (pCandidate.is(Items.GOLDEN_AXE) || !pExisting.is(Items.GOLDEN_AXE)) &&
                         super.canReplaceCurrentItem(pCandidate, pExisting);
             }
         }
     }
 
     /** this is where the "barter recipe" check begins **/
-    protected void pickUpItem(@NotNull ItemEntity stack) {
-        this.onItemPickup(stack);
+    protected void pickUpItem(@NotNull ItemEntity itemEntity) {
+        this.onItemPickup(itemEntity);
         setHoldingItem(true);
         stopWalking(this);
-        ItemStack itemstack = ItemStack.EMPTY;
-        this.setItemSlot(EquipmentSlot.OFFHAND, itemstack);
-        if (stack.getItem().is(Items.GOLD_NUGGET)) {
-            this.take(stack, stack.getItem().getCount());
-            itemstack = stack.getItem();
-            stack.discard();
+        ItemStack stack = ItemStack.EMPTY;
+        this.setItemSlot(EquipmentSlot.OFFHAND, stack);
+        this.getItemInHand(InteractionHand.OFF_HAND);
+        this.setItemInHand(InteractionHand.OFF_HAND, stack);
+
+        if (itemEntity.getItem().is(Items.GOLD_NUGGET)) {
+            this.take(itemEntity, itemEntity.getItem().getCount());
+            stack = itemEntity.getItem();
+            itemEntity.discard();
         }
         else {
-            this.take(stack, 1);
-            itemstack = removeOneItemFromItemEntity(stack);
+            this.take(itemEntity, 1);
+            stack = removeOneItemFromItemEntity(itemEntity);
         }
-        if (TodePiglinBarterCurrencySensor.isLovedItem(itemstack)) {
+        if (TodePiglinBarterCurrencySensor.isLovedItem(stack)) {
             this.getBrain().eraseMemory(MemoryModuleType.TIME_TRYING_TO_REACH_ADMIRE_ITEM);
-            holdingInOffhand(this, itemstack);
+            holdInOffhand(this, stack);
             TodePiglinBarterCurrencySensor.admireItem(this);
         }
-        else if (EatFood.isFood(itemstack) && EatFood.hasEatenRecently(this)) {
-            holdingInOffhand(this, itemstack);
+        else if (EatFood.isFood(stack) && EatFood.hasEatenRecently(this)) {
+            holdInOffhand(this, stack);
             EatFood.eat(this);
         }
         else {
-            boolean flag = this.equipItemIfPossible(itemstack);
+            boolean flag = this.equipItemIfPossible(stack);
             if (!flag) {
-                putInInventory(this, itemstack);
-                setHoldingItem(false);
+                putInInventory(this, stack);
             }
         }
     }
@@ -832,43 +775,36 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     public static void stopHoldingOffHandItem(@NotNull TodePiglinMerchant todePiglinMerchant, boolean pShouldBarter) {
         ItemStack stack = todePiglinMerchant.getItemInHand(InteractionHand.OFF_HAND);
         todePiglinMerchant.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
-        if (todePiglinMerchant.isAdult()) {
-            boolean flag = (stack.is(ModTags.Items.PIGLIN_BARTER_ITEMS));
-            if (pShouldBarter && flag) {
-                //accepts the trade - happy emote here & and gives an item
-                //particle emote set in sensor
-                todePiglinMerchant.setDataYesNod(true);
-                todePiglinMerchant.setWillingToBarter(false);
-                throwItems(todePiglinMerchant, getBarterResponseItems(todePiglinMerchant));
-            }
-            else if (!flag) {
-                //accepts the gift, pleasant emote
-                //particle emote set in sensor
-                boolean flag1 = (stack.is(ItemTags.PIGLIN_LOVED) || stack.is(ItemTags.PIGLIN_FOOD));
-                boolean flag2 = todePiglinMerchant.equipItemIfPossible(stack);
-                if (flag1 && !flag2) {
-                    //particle emote set in sensor
-                    putInInventory(todePiglinMerchant, stack);
-                }
-                else if (!flag1 && flag2) {
-                    todePiglinMerchant.equipItemIfPossible(stack);
-                }
-                else {
-                    throwItems(todePiglinMerchant, Collections.singletonList(stack));
-                }
+        boolean flag = (stack.is(ModTags.Items.PIGLIN_BARTER_ITEMS));
+        if (pShouldBarter && flag) {
+            throwItems(todePiglinMerchant, getBarterResponseItems(todePiglinMerchant));
+        }
+        else if (!flag) {
+            boolean flag1 = todePiglinMerchant.equipItemIfPossible(stack);
+            if (!flag1) {
+                putInInventory(todePiglinMerchant, stack);
             }
         }
         else {
-            // rejects offer, unpleasant emote
-            todePiglinMerchant.setDataNoNod(true);
-            throwItems(todePiglinMerchant, Collections.singletonList(stack));
+            boolean flag2 = todePiglinMerchant.equipItemIfPossible(stack);
+            if (!flag2) {
+                ItemStack stack1 = todePiglinMerchant.getMainHandItem();
+                if (stack1.is(ItemTags.PIGLIN_LOVED)) {
+                    putInInventory(todePiglinMerchant, stack1);
+                }
+                else {
+                    throwItems(todePiglinMerchant, Collections.singletonList(stack1));
+                }
+
+                todePiglinMerchant.holdInMainHand(stack);
+            }
         }
     }
     /** if I can get the custom currency working then maybe I can then get custom loot tables running too
      * it's very likely that I can get this running with the sensor **/
     private static @NotNull List<ItemStack> getBarterResponseItems(TodePiglinMerchant todePiglinMerchant) {
         //maybe dance?
-        barterDance(todePiglinMerchant);
+        wantsToDance(todePiglinMerchant);
         LootTable lootTable = Objects.requireNonNull(todePiglinMerchant.level.getServer()).getLootTables().get(BuiltInLootTables.PIGLIN_BARTERING);
         return lootTable.getRandomItems((
                 new LootContext.Builder((ServerLevel)todePiglinMerchant.level))
@@ -878,7 +814,6 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     // items thrown in response to item held
     private static void throwItems(@NotNull TodePiglinMerchant todePiglinMerchant, List<ItemStack> stacks) {
         Optional<Player> optional = todePiglinMerchant.getBrain().getMemory(MemoryModuleType.NEAREST_VISIBLE_PLAYER);
-        todePiglinMerchant.setHoldingItem(false);
         if (optional.isPresent()) {
             throwItemsTowardPlayer(todePiglinMerchant, optional.get(), stacks);
         }
@@ -887,15 +822,12 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
         }
     }
     private static void throwItemsTowardRandomPos(@NotNull TodePiglinMerchant todePiglinMerchant, List<ItemStack> stacks) {
-        todePiglinMerchant.setHoldingItem(false);
         throwItemsTowardPos(todePiglinMerchant, stacks, getRandomNearbyPos(todePiglinMerchant));
     }
     private static void throwItemsTowardPlayer(@NotNull TodePiglinMerchant todePiglinMerchant, @NotNull Player pPlayer, List<ItemStack> stacks) {
-        todePiglinMerchant.setHoldingItem(false);
         throwItemsTowardPos(todePiglinMerchant, stacks, pPlayer.position());
     }
     private static void throwItemsTowardPos(@NotNull TodePiglinMerchant todePiglinMerchant, @NotNull List<ItemStack> stacks, Vec3 pPos) {
-        todePiglinMerchant.setHoldingItem(false);
         if (!stacks.isEmpty()) {
             todePiglinMerchant.swing(InteractionHand.OFF_HAND);
             for(ItemStack itemstack : stacks) {
@@ -907,29 +839,19 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
         Vec3 vec3 = LandRandomPos.getPos(todePiglinMerchant, 4, 2);
         return vec3 == null ? todePiglinMerchant.position() : vec3;
     }
-    /** Dance here works, may want to make a switch for bartering while dancing is active **/
-    private static void barterDance(@NotNull TodePiglinMerchant todePiglinMerchant) {
-        float DanceChance;
-        DanceChance = RandomSource.create(todePiglinMerchant.level.getGameTime()).nextFloat();
-        // dance chance roll fails
-        if (DanceChance < PROBABILITY_OF_CELEBRATION_DANCE) {
-            Vec3 vec3 = todePiglinMerchant.getDeltaMovement();
-            todePiglinMerchant.level.addParticle(ParticleTypes.SNEEZE,
-                    todePiglinMerchant.getX() - (todePiglinMerchant.getBbWidth() + 1.0F) * 0.5D *
-                            (double) Mth.sin(todePiglinMerchant.yBodyRot * ((float)Math.PI / 180F)),
-                    todePiglinMerchant.getEyeY() - (double)0.1F, todePiglinMerchant.getZ() +
-                            (todePiglinMerchant.getBbWidth() + 1.0F) * 0.5D *
-                                    (double)Mth.cos(todePiglinMerchant.yBodyRot * ((float)Math.PI / 180F)), vec3.x, 0.0D, vec3.z);
-            todePiglinMerchant.playSound(SoundEvents.PANDA_SNEEZE, 1.0F, 1.0F);
-            todePiglinMerchant.setWillingToBarter(true);
-        }
-        // dance chance roll succeeds
-        else if (DanceChance > PROBABILITY_OF_CELEBRATION_DANCE) {
-            todePiglinMerchant.setDancing(true);
+    public boolean hurt(@NotNull DamageSource dmgSrc, float dmgAmt) {
+        boolean flag = super.hurt(dmgSrc, dmgAmt);
+        if (this.level.isClientSide) {
+            return false;
+        } else {
+            if (flag && dmgSrc.getEntity() instanceof LivingEntity) {
+                wasHurtBy(this, (LivingEntity)dmgSrc.getEntity());
+            }
+
+            return flag;
         }
     }
-
-    private boolean wasHurtBy(TodePiglinMerchant todePiglinMerchant, LivingEntity hurtBy) {
+    public void wasHurtBy(TodePiglinMerchant todePiglinMerchant, LivingEntity hurtBy) {
         if (!(hurtBy instanceof TodePiglinMerchant) && !(hurtBy instanceof AbstractPiglin)) {
             if (isHoldingItemInOffHand(todePiglinMerchant)) {
                 stopHoldingOffHandItem(todePiglinMerchant, false);
@@ -939,7 +861,6 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
             BrainUtils.clearMemory(todePiglinMerchant, MemoryModuleType.ADMIRING_ITEM);
             if (hurtBy instanceof Player) {
                 BrainUtils.setForgettableMemory(todePiglinMerchant, MemoryModuleType.ADMIRING_DISABLED, true, HIT_BY_PLAYER_MEMORY_TIMEOUT);
-                return true;
             }
             TodePiglinSpecificSensor.getAvoidTarget(todePiglinMerchant).ifPresent((livingEntity) -> {
                 if (livingEntity.getType() != hurtBy.getType()) {
@@ -949,12 +870,10 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
             if (hurtBy.getType() == EntityType.HOGLIN && TodePiglinSpecificSensor.hoglinsOutnumberPiglins(todePiglinMerchant)) {
                 TodePiglinSpecificSensor.setAvoidTargetAndDontHuntForAWhile(todePiglinMerchant, hurtBy);
                 TodePiglinSpecificSensor.broadcastRetreat(todePiglinMerchant, hurtBy);
-                return false;
             }
             else {
                 SetAngerTarget.maybeRetaliate(todePiglinMerchant, hurtBy);
             }
         }
-        return false;
     }
 }

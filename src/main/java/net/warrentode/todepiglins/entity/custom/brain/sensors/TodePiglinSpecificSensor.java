@@ -123,7 +123,7 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
                         adultHoglinCount++;
 
                         // check for huntable hoglins
-                        if (huntableHoglin == null && hoglin.canBeHunted()) {
+                        if (huntableHoglin == null && hoglin.canBeHunted() && adultHoglinCount > 2 && !(hoglin.isBaby())) {
                             huntableHoglin = hoglin;
                         }
                     }
@@ -260,15 +260,6 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
                 || type == EntityType.ZOMBIE_VILLAGER
                 || type == EntityType.ZOMBIE_HORSE;
     }
-    private static boolean isNearZombified(LivingEntity livingEntity, LivingEntity livingEntity1) {
-        if (BrainUtils.hasMemory(livingEntity, MemoryModuleType.NEAREST_VISIBLE_ZOMBIFIED)) {
-            LivingEntity livingentity = BrainUtils.getMemory(livingEntity,MemoryModuleType.NEAREST_VISIBLE_ZOMBIFIED);
-            assert livingentity != null;
-            return livingentity.closerThan(livingEntity1, TodePiglinMerchant.MIN_AVOID_DISTANCE);
-        } else {
-            return false;
-        }
-    }
     public static boolean isNearRepellent(@NotNull TodePiglinMerchant todePiglinMerchant) {
         return todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.NEAREST_REPELLENT);
     }
@@ -313,45 +304,9 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
             return false;
         }
     }
-
-    public static boolean isNearestValidAttackTarget(LivingEntity livingEntity) {
-        return findNearestValidAttackTarget(livingEntity) != null;
-    }
-    @SuppressWarnings("SameReturnValue")
     public static @Nullable Player getNearestVisibleTargetablePlayer(@NotNull TodePiglinMerchant todePiglinMerchant) {
         if (todePiglinMerchant.getBrain().getMemory(MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER).isPresent()) {
             todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER);
-        }
-        return null;
-    }
-    public static @Nullable LivingEntity findNearestValidAttackTarget(@NotNull LivingEntity livingEntity) {
-        //noinspection unchecked
-        Brain<TodePiglinMerchant> brain = (Brain<TodePiglinMerchant>) livingEntity.getBrain();
-        // ignore zombie types
-        if (isNearZombified(livingEntity, livingEntity)) {
-            return null;
-        }
-        // ignore allies
-        else if (isAlliedTo((Mob) livingEntity, livingEntity)) {
-            return null;
-        }
-        else {
-            if (brain.getMemory(MemoryModuleType.ANGRY_AT).isPresent()) {
-                return livingEntity;
-            }
-            else {
-                if (brain.hasMemoryValue(MemoryModuleType.UNIVERSAL_ANGER)) {
-                    if (brain.getMemory(MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER).isPresent()) {
-                        return livingEntity;
-                    }
-                }
-                else if (brain.getMemory(MemoryModuleType.NEAREST_VISIBLE_NEMESIS).isPresent()) {
-                    return livingEntity;
-                }
-                else if (brain.getMemory(MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD).isPresent()) {
-                    return livingEntity;
-                }
-            }
         }
         return null;
     }

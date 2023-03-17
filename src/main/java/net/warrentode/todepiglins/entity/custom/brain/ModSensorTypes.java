@@ -2,6 +2,7 @@ package net.warrentode.todepiglins.entity.custom.brain;
 
 import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
+import net.warrentode.todepiglins.entity.custom.brain.sensors.NearestWantedItemSensor;
 import net.warrentode.todepiglins.entity.custom.brain.sensors.TodePiglinBarterCurrencySensor;
 import net.warrentode.todepiglins.entity.custom.brain.sensors.TodePiglinSpecificSensor;
 import net.warrentode.todepiglins.entity.custom.todepiglinmerchant.TodePiglinMerchant;
@@ -12,6 +13,9 @@ import java.util.function.Supplier;
 public class ModSensorTypes {
     @SuppressWarnings("EmptyMethod")
     public static void init() {}
+
+    public static final Supplier<SensorType<NearestWantedItemSensor<?>>> NEAREST_WANTED_ITEM_SENSOR
+            = register("nearest_wanted_item_sensor", NearestWantedItemSensor::new);
     public static final Supplier<SensorType<TodePiglinSpecificSensor<?>>> TODEPIGLIN_SPECIFIC
             = register("todepiglin_specific_sensor", TodePiglinSpecificSensor::new);
 
