@@ -2,7 +2,6 @@ package net.warrentode.todepiglins.entity.custom.brain.behaviors;
 
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -24,11 +23,7 @@ public class EatFood extends ExtendedBehaviour<TodePiglinMerchant> {
                     Pair.of(MemoryModuleType.ATE_RECENTLY, MemoryStatus.VALUE_ABSENT)
             );
 
-    public static boolean isFood(@NotNull ItemStack pStack) {
-        return pStack.is(ItemTags.PIGLIN_FOOD);
-    }
-
-    public static boolean hasEatenRecently(@NotNull TodePiglinMerchant todePiglinMerchant) {
+    public static boolean hasNotEatenRecently(@NotNull TodePiglinMerchant todePiglinMerchant) {
         return !todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.ATE_RECENTLY);
     }
 

@@ -4,7 +4,7 @@ license="GNU_GPL.3"
 #issueTrackerURL="https://github.com/toadie-odie/todepiglins/issues"
 [[mods]]
 modId="todepiglins"
-version="1.19.2-0.0.4"
+version="1.19.2-0.0.6"
 displayName="TodePiglins"
 #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
 displayURL="https://github.com/toadie-odie/todepiglins"

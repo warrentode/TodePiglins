@@ -12,6 +12,7 @@ import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
+import net.minecraft.world.entity.monster.AbstractIllager;
 import net.minecraft.world.entity.monster.WitherSkeleton;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
@@ -154,7 +155,7 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
                     }
                 }
                 // DETECT ZOMBIFIED
-                else if (nemesis != null || !(target instanceof WitherSkeleton) && !(target instanceof WitherBoss)) {
+                else if (nemesis != null || !(target instanceof WitherSkeleton) && !(target instanceof WitherBoss) && !(target instanceof AbstractIllager)) {
                     if (zombified == null && isZombified(target.getType())) {
                         zombified = target;
                     }
