@@ -34,8 +34,9 @@ public class EatFood extends ExtendedBehaviour<TodePiglinMerchant> {
 
     public static boolean eat(@NotNull TodePiglinMerchant todePiglinMerchant) {
         ItemStack stack = todePiglinMerchant.getItemInHand(InteractionHand.OFF_HAND);
-        todePiglinMerchant.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+        todePiglinMerchant.setItemInHand(InteractionHand.OFF_HAND, stack);
         if (stack.getCount() <= stack.getMaxStackSize() && (todePiglinMerchant.getHealth() < todePiglinMerchant.getMaxHealth())) {
+            todePiglinMerchant.swing(InteractionHand.OFF_HAND);
             BrainUtils.setForgettableMemory(todePiglinMerchant,MemoryModuleType.ATE_RECENTLY, true, EAT_COOLDOWN);
             stack.shrink(1);
             todePiglinMerchant.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 50, 0));
