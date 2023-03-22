@@ -54,22 +54,20 @@ public class TodePiglinBarterCurrencySensor<E extends LivingEntity> extends Exte
         return stack.is(ItemTags.PIGLIN_LOVED);
     }
     public static boolean isWantedItem(@NotNull ItemStack stack) {
-        return stack.is(ItemTags.PIGLIN_LOVED) ||
-                stack.is(ItemTags.PIGLIN_FOOD) ||
-                stack.is(ModTags.Items.PIGLIN_BARTER_ITEMS);
+        return stack.is(ModTags.Items.PIGLIN_WANTED_ITEMS);
     }
     public static boolean canAdmire(TodePiglinMerchant todePiglinMerchant, ItemStack stack) {
         return !isAdmiringDisabled(todePiglinMerchant) && !isAdmiringItem(todePiglinMerchant)
-                && stack.is(ItemTags.PIGLIN_LOVED);
+                && stack.is(ModTags.Items.PIGLIN_WANTED_ITEMS);
     }
     public static void admireItem(@NotNull TodePiglinMerchant todePiglinMerchant) {
         BrainUtils.setForgettableMemory(todePiglinMerchant, MemoryModuleType.ADMIRING_ITEM, true, TodePiglinMerchant.ADMIRE_DURATION);
     }
-    public static boolean isAdmiringDisabled(@NotNull TodePiglinMerchant todePiglinMerchant) {
-        return BrainUtils.hasMemory(todePiglinMerchant, MemoryModuleType.ADMIRING_DISABLED);
-    }
     public static boolean isAdmiringItem(@NotNull TodePiglinMerchant todePiglinMerchant) {
         return BrainUtils.hasMemory(todePiglinMerchant, MemoryModuleType.ADMIRING_ITEM);
+    }
+    public static boolean isAdmiringDisabled(@NotNull TodePiglinMerchant todePiglinMerchant) {
+        return BrainUtils.hasMemory(todePiglinMerchant, MemoryModuleType.ADMIRING_DISABLED);
     }
     public static boolean isNotHoldingWantedItemInOffHand(@NotNull TodePiglinMerchant todePiglinMerchant) {
         return todePiglinMerchant.getOffhandItem().isEmpty() || !isWantedItem(todePiglinMerchant.getOffhandItem());
