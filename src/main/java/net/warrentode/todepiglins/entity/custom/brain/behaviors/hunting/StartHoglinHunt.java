@@ -8,7 +8,7 @@ import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour;
 import net.warrentode.todepiglins.entity.custom.brain.ModMemoryTypes;
-import net.warrentode.todepiglins.entity.custom.brain.behaviors.SetAngerTarget;
+import net.warrentode.todepiglins.entity.custom.brain.behaviors.combat.SetAngerTarget;
 import net.warrentode.todepiglins.entity.custom.brain.sensors.TodePiglinSpecificSensor;
 import net.warrentode.todepiglins.entity.custom.todepiglinmerchant.TodePiglinMerchant;
 import org.jetbrains.annotations.NotNull;

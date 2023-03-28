@@ -1,4 +1,4 @@
-package net.warrentode.todepiglins.entity.custom.brain.behaviors;
+package net.warrentode.todepiglins.entity.custom.brain.behaviors.combat;
 
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static net.minecraft.world.entity.monster.piglin.PiglinAi.angerNearbyPiglins;
 import static net.warrentode.todepiglins.entity.custom.todepiglinmerchant.TodePiglinMerchant.TIME_BETWEEN_HUNTS;
 
 public class SetAngerTarget extends ExtendedBehaviour<TodePiglinMerchant> {
@@ -32,7 +33,8 @@ public class SetAngerTarget extends ExtendedBehaviour<TodePiglinMerchant> {
                     Pair.of(MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER, MemoryStatus.VALUE_PRESENT),
                     Pair.of(MemoryModuleType.ATTACK_TARGET, MemoryStatus.VALUE_ABSENT),
                     Pair.of(MemoryModuleType.ANGRY_AT, MemoryStatus.VALUE_ABSENT),
-                    Pair.of(MemoryModuleType.UNIVERSAL_ANGER, MemoryStatus.VALUE_ABSENT)
+                    Pair.of(MemoryModuleType.UNIVERSAL_ANGER, MemoryStatus.VALUE_ABSENT),
+                    Pair.of(MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD, MemoryStatus.VALUE_PRESENT)
             );
 
     public static void setAngerTarget(TodePiglinMerchant todePiglinMerchant, LivingEntity angerTarget) {
@@ -138,6 +140,7 @@ public class SetAngerTarget extends ExtendedBehaviour<TodePiglinMerchant> {
             BrainUtils.setMemory(todePiglinMerchant, MemoryModuleType.ATTACK_TARGET, targetPlayer);
             BrainUtils.clearMemory(todePiglinMerchant, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
             angerNearbyTodePiglins(targetPlayer, true);
+            angerNearbyPiglins(targetPlayer, true);
         }
     }
 

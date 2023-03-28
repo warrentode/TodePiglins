@@ -1,0 +1,27 @@
+{
+  "todepiglinmerchant_eat": {
+    "subtitle": "subtitles.todepiglins.todepiglinmerchant_eat",
+    "sounds": [
+      {
+        "name": "todepiglins:todepiglinmerchant_eat",
+        "weight": 1
+      },
+      {
+        "name": "minecraft:random/burp",
+        "weight": 3
+      },
+      {
+        "name": "minecraft:random/eat1",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:random/eat2",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:random/eat3",
+        "weight": 6
+      }
+    ]
+  }
+}

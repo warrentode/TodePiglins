@@ -16,7 +16,6 @@ public class TodePiglinMerchantModel extends AnimatedGeoModel<TodePiglinMerchant
     public void setCustomAnimations(TodePiglinMerchant animatable, int instanceId, AnimationEvent customPredicate) {
         super.setCustomAnimations(animatable, instanceId, customPredicate);
         IBone head = this.getAnimationProcessor().getBone("bipedHead");
-        IBone nose = this.getAnimationProcessor().getBone("noseBone");
 
         IBone headEmote = this.getAnimationProcessor().getBone("headParticles");
         IBone noseEmote = this.getAnimationProcessor().getBone("noseParticles");
@@ -32,9 +31,6 @@ public class TodePiglinMerchantModel extends AnimatedGeoModel<TodePiglinMerchant
 
         headEmote.setRotationX(headEmote.getRotationX() + extraData.headPitch * ((float) Math.PI / 180F) * unpausedMultiplier);
         headEmote.setRotationY(headEmote.getRotationY() + extraData.netHeadYaw * ((float) Math.PI / 180F) * unpausedMultiplier);
-
-        nose.setPositionX(nose.getPositionX() + extraData.headPitch * ((float) Math.PI / 180F) * unpausedMultiplier);
-        nose.setPositionY(nose.getPositionY() + extraData.netHeadYaw * ((float) Math.PI / 180F) * unpausedMultiplier);
 
         noseEmote.setPositionX(noseEmote.getPositionX() + extraData.headPitch * ((float) Math.PI / 180F) * unpausedMultiplier);
         noseEmote.setPositionY(noseEmote.getPositionY() + extraData.netHeadYaw * ((float) Math.PI / 180F) * unpausedMultiplier);

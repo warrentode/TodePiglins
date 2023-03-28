@@ -3,5 +3,7 @@
 
   "itemGroup.todepiglins_tab": "TodePiglins",
 
-  "item.todepiglins.todepiglinmerchant_spawn_egg": "Piglin Merchant Spawn Egg"
+  "item.todepiglins.todepiglinmerchant_spawn_egg": "Piglin Merchant Spawn Egg",
+
+  "subtitles.todepiglins.todepiglinmerchant_eat": "Piglin Merchant Eats"
 }

@@ -4,7 +4,7 @@ license="GNU_GPL.3"
 #issueTrackerURL="https://github.com/toadie-odie/todepiglins/issues"
 [[mods]]
 modId="todepiglins"
-version="1.19.2-0.0.6"
+version="1.19.2-0.0.7"
 displayName="TodePiglins"
 #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
 displayURL="https://github.com/toadie-odie/todepiglins"
@@ -13,7 +13,7 @@ credits='''Special thanks to my sons, and my supporters:
 Marshal Nash and Trevor Brannigan,
 for supporting my blog and my various projects!'''
 authors="Warren Tode (ToadieOdie)"
-description="This mod adds a variety of villagers with their trades to the game."
+description="This mod adds the Piglin Merchant."
 
 [[dependencies.todepiglins]]
 modId="forge"
@@ -33,6 +33,13 @@ side="BOTH"
 modId="smartbrainlib"
 mandatory=true
 versionRange="[1.7,)"
+ordering="NONE"
+side="SERVER"
+
+[[dependencies.todepiglins]]
+modId="geckolib3"
+mandatory=true
+versionRange="[3.1.4,)"
 ordering="NONE"
 side="SERVER"
 

@@ -11,6 +11,7 @@ public class ModTags {
 
     public static class Items {
         public static final TagKey<Item> PIGLIN_BARTER_ITEMS = modItemTag("piglin_barter_items");
+        public static final TagKey<Item> PIGLIN_WANTED_ITEMS = modItemTag("piglin_wanted_items");
     }
 
     @SuppressWarnings("SameParameterValue")

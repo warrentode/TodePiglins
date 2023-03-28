@@ -17,10 +17,10 @@ import net.warrentode.todepiglins.entity.custom.brain.BrainBoot;
 import net.warrentode.todepiglins.entity.custom.todepiglinmerchant.TodePiglinMerchant;
 import net.warrentode.todepiglins.item.ModItems;
 import net.warrentode.todepiglins.recipe.ModRecipeTypes;
+import net.warrentode.todepiglins.sounds.ModSounds;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import software.bernie.geckolib3.GeckoLib;
 
 @Mod(TodePiglins.MODID)
 public class TodePiglins {
@@ -33,12 +33,12 @@ public class TodePiglins {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         BrainBoot.init();
-        ModEntityTypes.register(modEventBus);
 
+        ModSounds.REGISTRY.register(modEventBus);
+
+        ModEntityTypes.register(modEventBus);
         ModItems.register(modEventBus);
         ModRecipeTypes.register(modEventBus);
-
-        GeckoLib.initialize();
 
         modEventBus.addListener(this::commonSetup);
     }

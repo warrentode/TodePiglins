@@ -1,4 +1,4 @@
-package net.warrentode.todepiglins.entity.custom.brain.behaviors.hunting;
+package net.warrentode.todepiglins.entity.custom.brain.behaviors.combat;
 
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;

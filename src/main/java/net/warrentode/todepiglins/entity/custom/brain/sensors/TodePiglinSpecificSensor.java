@@ -2,13 +2,13 @@ package net.warrentode.todepiglins.entity.custom.brain.sensors;
 
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
@@ -23,11 +23,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.tslat.smartbrainlib.api.core.SmartBrain;
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
 import net.tslat.smartbrainlib.util.BrainUtils;
 import net.warrentode.todepiglins.entity.custom.brain.ModMemoryTypes;
 import net.warrentode.todepiglins.entity.custom.brain.ModSensorTypes;
-import net.warrentode.todepiglins.entity.custom.brain.behaviors.SetAngerTarget;
+import net.warrentode.todepiglins.entity.custom.brain.behaviors.combat.SetAngerTarget;
 import net.warrentode.todepiglins.entity.custom.todepiglinmerchant.TodePiglinMerchant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,6 +36,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import static net.warrentode.todepiglins.entity.custom.brain.behaviors.food.EatFood.countFoodPointsInInventory;
 
 public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSensor<E> {
     private static final ImmutableList<MemoryModuleType<?>> MEMORIES =
@@ -94,7 +97,10 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
 
     @Override
     protected void doTick(ServerLevel level, @NotNull E entity) {
-        Brain<?> brain = entity.getBrain();
+        SmartBrain<?> brain = (SmartBrain<?>) entity.getBrain();
+        TodePiglinMerchant todePiglinMerchant = (TodePiglinMerchant) entity;
+        ItemStack stack = ItemStack.EMPTY.getItem().getDefaultInstance();
+        countFoodPointsInInventory(todePiglinMerchant, stack);
 
         List<TodePiglinMerchant> adultTodePiglins = new ObjectArrayList<>();
         List<AbstractPiglin> adultPiglins = new ObjectArrayList<>();
@@ -104,7 +110,7 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
             Hoglin huntableHoglin = null;
             Hoglin babyHoglin = null;
             LivingEntity zombified = null;
-            Player playerNoGold = null;
+            Player playerNoFriendlyGear = null;
             Player playerWithGoodie = null;
 
             List<TodePiglinMerchant> visibleAdultTodePiglins = new ObjectArrayList<>();
@@ -138,15 +144,15 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
                         visibleAdultPiglins.add(piglin);
                     }
                 }
-                else if (target instanceof TodePiglinMerchant todePiglinMerchant) {
+                else if (target instanceof TodePiglinMerchant) {
                     if (todePiglinMerchant.isAdult()) {
                         visibleAdultTodePiglins.add(todePiglinMerchant);
                     }
                 }
                 // PLAYER DETECTION
-                else if (target instanceof Player player) {
-                    if (playerNoGold == null && !isWearingGold(player) && entity.canAttack(player)) {
-                        playerNoGold = player;
+                else if (target instanceof LocalPlayer player) {
+                    if (playerNoFriendlyGear == null && !isWearingFriendlyGear(player) && entity.canAttack(player)) {
+                        playerNoFriendlyGear = player;
                     }
 
                     if (playerWithGoodie == null && !player.isSpectator() && isPlayerHoldingLovedItem(player)) {
@@ -175,7 +181,7 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
             BrainUtils.setMemory(brain, MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN, huntableHoglin);
             BrainUtils.setMemory(brain, MemoryModuleType.VISIBLE_ADULT_HOGLIN_COUNT, adultHoglinCount);
             // set memories for players
-            BrainUtils.setMemory(brain, MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD, playerNoGold);
+            BrainUtils.setMemory(brain, MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD, playerNoFriendlyGear);
             BrainUtils.setMemory(brain, MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM, playerWithGoodie);
             // set memories for vanilla community
             BrainUtils.setMemory(entity, MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS, visibleAdultPiglins);
@@ -205,7 +211,7 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
                     // add to the list the nearest adult piglins
                     adultPiglins.add(abstractPiglin);
                 }
-                else if (target instanceof TodePiglinMerchant todePiglinMerchant && todePiglinMerchant.isAdult()) {
+                else if (target instanceof TodePiglinMerchant && todePiglinMerchant.isAdult()) {
                     // add to the list the nearest adult todepiglins
                     adultTodePiglins.add(todePiglinMerchant);
                 }
@@ -251,7 +257,9 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
         LivingEntity nearestTarget;
         nearestTarget = retreatTarget;
         BrainUtils.setMemory(todePiglinMerchant, MemoryModuleType.AVOID_TARGET, retreatTarget);
-        setAvoidTargetAndDontHuntForAWhile(todePiglinMerchant, nearestTarget);
+        if (retreatTarget instanceof Hoglin) {
+            setAvoidTargetAndDontHuntForAWhile(todePiglinMerchant, nearestTarget);
+        }
     }
 
     private boolean isZombified(EntityType<?> type) {
@@ -262,15 +270,21 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
                 || type == EntityType.ZOMBIE_HORSE;
     }
     public static boolean isNearRepellent(@NotNull TodePiglinMerchant todePiglinMerchant) {
-        return todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.NEAREST_REPELLENT);
+        if (BrainUtils.hasMemory(todePiglinMerchant, MemoryModuleType.NEAREST_REPELLENT)) {
+            return todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.NEAREST_REPELLENT);
+        }
+        return false;
     }
     public static Optional<LivingEntity> getAvoidTarget(@NotNull TodePiglinMerchant todePiglinMerchant) {
         return todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.AVOID_TARGET) ?
                 todePiglinMerchant.getBrain().getMemory(MemoryModuleType.AVOID_TARGET) : Optional.empty();
     }
     public static boolean isNearAvoidTarget(TodePiglinMerchant todePiglinMerchant) {
-        return Objects.requireNonNull(BrainUtils.getMemory(todePiglinMerchant, MemoryModuleType.AVOID_TARGET))
-                .closerThan(todePiglinMerchant, TodePiglinMerchant.DESIRED_AVOID_DISTANCE);
+        if (BrainUtils.hasMemory(todePiglinMerchant, MemoryModuleType.AVOID_TARGET)) {
+            return Objects.requireNonNull(BrainUtils.getMemory(todePiglinMerchant, MemoryModuleType.AVOID_TARGET))
+                    .closerThan(todePiglinMerchant, TodePiglinMerchant.DESIRED_AVOID_DISTANCE);
+        }
+        return false;
     }
 
     public static boolean isPlayerHoldingLovedItem(@NotNull Player player) {
@@ -279,7 +293,7 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
     public static boolean seesPlayerHoldingLovedItem(TodePiglinMerchant todePiglinMerchant) {
         return BrainUtils.hasMemory(todePiglinMerchant, MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM);
     }
-    public static boolean isWearingGold(@NotNull Player player) {
+    public static boolean isWearingFriendlyGear(@NotNull Player player) {
         for(ItemStack itemstack : player.getArmorSlots()) {
             itemstack.getItem();
             if (itemstack.makesPiglinsNeutral(player)) {
