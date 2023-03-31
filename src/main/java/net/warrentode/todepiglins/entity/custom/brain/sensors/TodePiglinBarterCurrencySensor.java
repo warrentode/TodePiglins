@@ -49,7 +49,6 @@ public class TodePiglinBarterCurrencySensor<E extends LivingEntity> extends Exte
         ItemStack stack = ItemStack.EMPTY;
         stack.is(ModTags.Items.PIGLIN_BARTER_ITEMS);
     }
-
     public static boolean isLovedItem(@NotNull ItemStack stack) {
         return stack.is(ItemTags.PIGLIN_LOVED);
     }

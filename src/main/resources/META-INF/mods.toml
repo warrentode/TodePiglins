@@ -1,10 +1,10 @@
 modLoader="javafml"
 loaderVersion="[43,)"
-license="GNU_GPL.3"
-#issueTrackerURL="https://github.com/toadie-odie/todepiglins/issues"
+license="MIT"
+issueTrackerURL="https://github.com/toadie-odie/todepiglins/issues"
 [[mods]]
 modId="todepiglins"
-version="1.19.2-0.0.7"
+version="1.19.2-0.0.8"
 displayName="TodePiglins"
 #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
 displayURL="https://github.com/toadie-odie/todepiglins"
@@ -32,14 +32,14 @@ side="BOTH"
 [[dependencies.todepiglins]]
 modId="smartbrainlib"
 mandatory=true
-versionRange="[1.7,)"
+versionRange="[1.8.1,)"
 ordering="NONE"
 side="SERVER"
 
 [[dependencies.todepiglins]]
 modId="geckolib3"
 mandatory=true
-versionRange="[3.1.4,)"
+versionRange="[3.1.40,)"
 ordering="NONE"
 side="SERVER"
 

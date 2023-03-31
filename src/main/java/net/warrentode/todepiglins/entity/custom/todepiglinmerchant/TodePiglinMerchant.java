@@ -1,6 +1,5 @@
 package net.warrentode.todepiglins.entity.custom.todepiglinmerchant;
 
-import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -105,6 +104,7 @@ import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.controller.AnimationController;
+import software.bernie.geckolib3.core.controller.AnimationController.IParticleListener;
 import software.bernie.geckolib3.core.event.ParticleKeyFrameEvent;
 import software.bernie.geckolib3.core.event.SoundKeyframeEvent;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
@@ -113,14 +113,17 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static net.warrentode.todepiglins.entity.custom.brain.sensors.TodePiglinBarterCurrencySensor.isAdmiringItem;
 import static net.warrentode.todepiglins.entity.custom.brain.sensors.TodePiglinBarterCurrencySensor.isLovedItem;
 import static software.bernie.geckolib3.core.builder.ILoopType.EDefaultLoopTypes.HOLD_ON_LAST_FRAME;
 import static software.bernie.geckolib3.core.builder.ILoopType.EDefaultLoopTypes.LOOP;
 
-public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodePiglinMerchant>, IAnimatable, InventoryCarrier {
+public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodePiglinMerchant>, IAnimatable, IParticleListener<TodePiglinMerchant>, InventoryCarrier {
     private static final EntityDataAccessor<Boolean> DATA_IS_DANCING =
             SynchedEntityData.defineId(TodePiglinMerchant.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_CANNOT_HUNT =
@@ -229,15 +232,11 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     public boolean isPreventingPlayerRest(@NotNull Player pPlayer) {
         return false;
     }
-    public boolean shouldDropExperience() {
-        return true;
-    }
+
     public int getExperienceReward() {
         return this.xpReward;
     }
-    protected boolean shouldDropLoot() {
-        return true;
-    }
+
     protected void dropCustomDeathLoot(@NotNull DamageSource pSource, int pLooting, boolean pRecentlyHit) {
         super.dropCustomDeathLoot(pSource, pLooting, pRecentlyHit);
         this.inventory.removeAllItems().forEach(this::spawnAtLocation);
@@ -502,14 +501,7 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
         BrainUtils.setForgettableMemory(brain, MemoryModuleType.HUNTED_RECENTLY, true, i);
         SmartBrainOwner.super.handleAdditionalBrainSetup(brain);
     }
-    @Override
-    public Set<Activity> getAlwaysRunningActivities() {
-        return ImmutableSet.of(Activity.CORE);
-    }
-    @Override
-    public Activity getDefaultActivity() {
-        return Activity.IDLE;
-    }
+
     @Override
     protected void customServerAiStep() {
         if (!BrainUtils.hasMemory(this.brain, MemoryModuleType.CELEBRATE_LOCATION)) {
@@ -604,67 +596,63 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     }
     @Override
     public void registerControllers(@NotNull AnimationData data) {
-        data.addAnimationController(new AnimationController<>(this, "defaultController",
-                0, this::defaultPredicate));
-        data.addAnimationController(new AnimationController<>(this, "danceController",
-                0, this::dancePredicate));
-        data.addAnimationController(new AnimationController<>(this, "admireController",
-                0, this::admirePredicate));
-        data.addAnimationController(new AnimationController<>(this, "meleeController",
-                0, this::meleePredicate));
+        AnimationController<TodePiglinMerchant> defaultController = new AnimationController<>(
+                this, "defaultController", 0, this::defaultPredicate);
+        AnimationController<TodePiglinMerchant> admireController = new AnimationController<>(
+                this, "admireController", 0, this::admirePredicate);
+        AnimationController<TodePiglinMerchant> danceController = new AnimationController<>(
+                this, "danceController", 0, this::dancePredicate);
+        AnimationController<TodePiglinMerchant> meleeController = new AnimationController<>(
+                this, "meleeController", 0, this::meleePredicate);
 
-        AnimationController<TodePiglinMerchant> particleController = new AnimationController<>(
-                this, "particleController", 0, this::admirePredicate);
-        particleController.registerParticleListener(this::particleListener);
-        data.addAnimationController(particleController);
+        admireController.registerParticleListener(this);
+        admireController.registerSoundListener(this::soundListener);
 
-        AnimationController<TodePiglinMerchant> soundController = new AnimationController<>(
-                this, "soundController", 0, this::admirePredicate);
-        soundController.registerSoundListener(this::soundListener);
-        data.addAnimationController(soundController);
+        data.addAnimationController(defaultController);
+        data.addAnimationController(admireController);
+        data.addAnimationController(danceController);
+        data.addAnimationController(meleeController);
     }
 
-    private void soundListener(@NotNull SoundKeyframeEvent<TodePiglinMerchant> event) {
-        TodePiglinMerchant todePiglinMerchant = event.getEntity();
+    private void soundListener(@NotNull SoundKeyframeEvent<TodePiglinMerchant> keyframeEvent) {
+        TodePiglinMerchant todePiglinMerchant = keyframeEvent.getEntity();
         LocalPlayer player = Minecraft.getInstance().player;
         if (todePiglinMerchant.level.isClientSide && player != null) {
-            if (event.sound.equals("eat")) {
+            if (keyframeEvent.sound.equals("eat")) {
                 player.playSound(ModSounds.TODEPIGLINMERCHANT_EAT.get(), 1, 1);
             }
         }
     }
 
-    private void particleListener(@NotNull ParticleKeyFrameEvent<TodePiglinMerchant> event) {
-        TodePiglinMerchant todePiglinMerchant = event.getEntity();
-        if (todePiglinMerchant.level.isClientSide) {
-            if (event.effect.equals("happy") && event.locator.equals("headParticles")) {
-                for (int i = 0; i < 7; ++i) {
-                    double d0 = this.random.nextGaussian() * 0.02D;
-                    double d1 = this.random.nextGaussian() * 0.02D;
-                    double d2 = this.random.nextGaussian() * 0.02D;
-                    this.level.addParticle(ParticleTypes.HAPPY_VILLAGER, this.getRandomX(1.0D), this.getRandomY() + 1.0D, this.getRandomZ(1.0D), d0, d1, d2);
-                }
+    @Override
+    public void summonParticle(ParticleKeyFrameEvent keyFrameEvent) {
+        ItemStack stack = this.getOffhandItem();
+        if (getArmPose() == TodePiglinMerchantArmPose.ACCEPT_ITEM) {
+            for (int i = 0; i < 7; ++i) {
+                double d0 = this.random.nextGaussian() * 0.01D;
+                double d1 = this.random.nextGaussian() * 0.01D;
+                double d2 = this.random.nextGaussian() * 0.01D;
+                this.level.addParticle(ParticleTypes.HAPPY_VILLAGER, this.getRandomX(1.0D), this.getRandomY() + 0.2D, this.getRandomZ(1.0D), d0, d1, d2);
             }
-            else if (event.effect.equals("angry") && event.locator.equals("headParticles")) {
-                for (int i = 0; i < 7; ++i) {
-                    double d0 = this.random.nextGaussian() * 0.02D;
-                    double d1 = this.random.nextGaussian() * 0.02D;
-                    double d2 = this.random.nextGaussian() * 0.02D;
-                    this.level.addParticle(ParticleTypes.ANGRY_VILLAGER, this.getRandomX(1.0D), this.getRandomY() + 1.0D, this.getRandomZ(1.0D), d0, d1, d2);
-                }
+        }
+        else if (getArmPose() == TodePiglinMerchantArmPose.REJECT_ITEM) {
+            for (int i = 0; i < 7; ++i) {
+                double d0 = this.random.nextGaussian() * 0.01D;
+                double d1 = this.random.nextGaussian() * 0.01D;
+                double d2 = this.random.nextGaussian() * 0.01D;
+                this.level.addParticle(ParticleTypes.ANGRY_VILLAGER, this.getRandomX(1.0D), this.getRandomY() + 0.2D, this.getRandomZ(1.0D), d0, d1, d2);
             }
-            else if (event.effect.equals("item") && event.locator.equals("noseParticles")) {
-                ItemStack stack = this.getOffhandItem();
-                for (int i = 0; i < 7; ++i) {
-                    Vec3 vec3 = new Vec3(((double) this.random.nextFloat() - 0.5D) * 0.1D, Math.random() * 0.1D + 0.1D, ((double) this.random.nextFloat() - 0.5D) * 0.1D);
-                    vec3 = vec3.xRot(-this.getXRot() * ((float) Math.PI / 180F));
-                    vec3 = vec3.yRot(-this.getYRot() * ((float) Math.PI / 180F));
-                    double d0 = (double) (-this.random.nextFloat()) * 0.6D - 0.3D;
-                    Vec3 vec31 = new Vec3(((double) this.random.nextFloat() - 0.5D) * 0.8D, d0, 1.0D + ((double) this.random.nextFloat() - 0.5D) * 0.4D);
-                    vec31 = vec31.yRot(-this.yBodyRot * ((float) Math.PI / 180F));
-                    vec31 = vec31.add(this.getX(), this.getEyeY() - 0.2D, this.getZ());
-                    this.level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), vec31.x, vec31.y, vec31.z, vec3.x, vec3.y + 0.05D, vec3.z);
-                }
+        }
+        else if (getArmPose() == TodePiglinMerchantArmPose.EAT) {
+            for (int i = 0; i < 7; ++i) {
+                Vec3 vec3 = new Vec3(((double) this.random.nextFloat() - 0.5D) * 0.1D, Math.random() * 0.1D + 0.1D, ((double) this.random.nextFloat() - 0.5D) * 0.1D);
+                vec3 = vec3.xRot(-this.getXRot() * ((float) Math.PI / 180F));
+                vec3 = vec3.yRot(-this.getYRot() * ((float) Math.PI / 180F));
+                double d0 = (double) (-this.random.nextFloat()) * 0.6D - 0.3D;
+                Vec3 vec31 = new Vec3(((double) this.random.nextFloat() - 0.5D) * 0.8D, d0, 1.0D + ((double) this.random.nextFloat() - 0.5D) * 0.4D);
+                vec31 = vec31.yRot(-this.yBodyRot * ((float) Math.PI / 180F));
+                vec31 = vec31.add(this.getX(), this.getEyeY() - 0.2D, this.getZ());
+                this.level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), vec31.x, vec31.y, vec31.z, vec3.x, vec3.y + 0.05D, vec3.z);
             }
         }
     }
@@ -814,10 +802,10 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
             return interactionresult;
         }
         else if (!this.level.isClientSide) {
-            ItemStack itemstack = player.getItemInHand(hand);
-            if (TodePiglinBarterCurrencySensor.canAdmire(this, itemstack)) {
-                ItemStack itemstack1 = itemstack.split(1);
-                holdInOffhand(this, itemstack1);
+            ItemStack itemStack = player.getItemInHand(hand);
+            if (TodePiglinBarterCurrencySensor.canAdmire(this, itemStack)) {
+                ItemStack itemStack1 = itemStack.split(1);
+                holdInOffhand(this, itemStack1);
                 TodePiglinBarterCurrencySensor.admireItem(this);
                 stopWalking(this);
                 setHoldingItem(true);
