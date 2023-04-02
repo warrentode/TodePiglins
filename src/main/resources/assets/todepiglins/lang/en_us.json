@@ -5,5 +5,14 @@
 
   "item.todepiglins.todepiglinmerchant_spawn_egg": "Piglin Merchant Spawn Egg",
 
-  "subtitles.todepiglins.todepiglinmerchant_eat": "Piglin Merchant Eats"
+  "subtitles.todepiglins.todepiglinmerchant_eat": "Piglin Merchant eats",
+  "subtitles.todepiglins.todepiglinmerchant_hurt": "Piglin Merchant grunts in pain",
+  "subtitles.todepiglins.todepiglinmerchant_death": "Piglin Merchant dies",
+  "subtitles.todepiglins.todepiglinmerchant_step": "Piglin Merchant steps",
+  "subtitles.todepiglins.todepiglinmerchant_retreat": "Piglin Merchant squeals in retreat",
+  "subtitles.todepiglins.todepiglinmerchant_jealous": "Piglin Merchant snorts enviously",
+  "subtitles.todepiglins.todepiglinmerchant_ambient": "Piglin Merchant snorts",
+  "subtitles.todepiglins.todepiglinmerchant_celebrates": "Piglin Merchant celebrates",
+  "subtitles.todepiglins.todepiglinmerchant_anger": "Piglin Merchant snarls",
+  "subtitles.todepiglins.todepiglinmerchant_examine": "Piglin Merchant examines item"
 }

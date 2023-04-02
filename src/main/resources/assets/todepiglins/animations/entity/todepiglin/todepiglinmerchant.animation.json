@@ -2382,6 +2382,11 @@
 						}
 					}
 				}
+			},
+			"sound_effects": {
+				"0.25": {
+					"effect": "celebrate"
+				}
 			}
 		},
 		"nod_yes": {
@@ -3209,7 +3214,7 @@
 						}
 					}
 				},
-				"headParticles": {
+				"headparticles": {
 					"rotation": {
 						"vector": [0, 0, 0]
 					},
@@ -3219,56 +3224,17 @@
 					"scale": {
 						"vector": [1, 1, 1]
 					}
-				},
-				"noseParticles": {
-					"rotation": {
-						"0.0": {
-							"vector": [0, 0, 0]
-						},
-						"0.25": {
-							"vector": [0, 0, 0]
-						},
-						"0.5": {
-							"vector": [0, 0, 0]
-						},
-						"3.0": {
-							"vector": [0, 0, 0]
-						}
-					},
-					"position": {
-						"0.0": {
-							"vector": [0, 0, 0]
-						},
-						"0.25": {
-							"vector": [0, 0, 0]
-						},
-						"0.5": {
-							"vector": [0, 0, 0]
-						},
-						"3.0": {
-							"vector": [0, 0, 0]
-						}
-					},
-					"scale": {
-						"0.0": {
-							"vector": [1, 1, 1]
-						},
-						"0.25": {
-							"vector": [1, 1, 1]
-						},
-						"0.5": {
-							"vector": [1, 1, 1]
-						},
-						"3.0": {
-							"vector": [1, 1, 1]
-						}
-					}
+				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "examine"
 				}
 			},
 			"particle_effects": {
-				"0.0": {
+				"2.5": {
 					"effect": "heart",
-					"locator": "headParticles"
+					"locator": "headparticles"
 				}
 			}
 		},
@@ -3661,7 +3627,7 @@
 						}
 					}
 				},
-				"headParticles": {
+				"headparticles": {
 					"rotation": {
 						"vector": [0, 0, 0]
 					},
@@ -3671,56 +3637,17 @@
 					"scale": {
 						"vector": [1, 1, 1]
 					}
-				},
-				"noseParticles": {
-					"rotation": {
-						"0.0": {
-							"vector": [0, 0, 0]
-						},
-						"0.25": {
-							"vector": [0, 0, 0]
-						},
-						"0.5": {
-							"vector": [0, 0, 0]
-						},
-						"3.0": {
-							"vector": [0, 0, 0]
-						}
-					},
-					"position": {
-						"0.0": {
-							"vector": [0, 0, 0]
-						},
-						"0.25": {
-							"vector": [0, 0, 0]
-						},
-						"0.5": {
-							"vector": [0, 0, 0]
-						},
-						"3.0": {
-							"vector": [0, 0, 0]
-						}
-					},
-					"scale": {
-						"0.0": {
-							"vector": [1, 1, 1]
-						},
-						"0.25": {
-							"vector": [1, 1, 1]
-						},
-						"0.5": {
-							"vector": [1, 1, 1]
-						},
-						"3.0": {
-							"vector": [1, 1, 1]
-						}
-					}
+				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "examine"
 				}
 			},
 			"particle_effects": {
-				"0.0": {
-					"effect": "angry_villager",
-					"locator": "headParticles"
+				"2.5": {
+					"effect": "angry",
+					"locator": "headparticles"
 				}
 			}
 		},
@@ -4043,7 +3970,7 @@
 						}
 					}
 				},
-				"bipedArmRight": {
+				"armRight": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0]
@@ -4078,7 +4005,7 @@
 						}
 					}
 				},
-				"bipedHandRight": {
+				"handRight": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0]
@@ -4104,7 +4031,7 @@
 						}
 					}
 				},
-				"headParticles": {
+				"headparticles": {
 					"rotation": {
 						"vector": [0, 0, 0]
 					},
@@ -4114,56 +4041,17 @@
 					"scale": {
 						"vector": [1, 1, 1]
 					}
-				},
-				"noseParticles": {
-					"rotation": {
-						"0.0": {
-							"vector": [0, 0, 0]
-						},
-						"0.25": {
-							"vector": [0, 0, 0]
-						},
-						"0.5": {
-							"vector": [0, 0, 0]
-						},
-						"3.0": {
-							"vector": [0, 0, 0]
-						}
-					},
-					"position": {
-						"0.0": {
-							"vector": [0, 0, 0]
-						},
-						"0.25": {
-							"vector": [0, 0, 0]
-						},
-						"0.5": {
-							"vector": [0, 0, 0]
-						},
-						"3.0": {
-							"vector": [0, 0, 0]
-						}
-					},
-					"scale": {
-						"0.0": {
-							"vector": [1, 1, 1]
-						},
-						"0.25": {
-							"vector": [1, 1, 1]
-						},
-						"0.5": {
-							"vector": [1, 1, 1]
-						},
-						"3.0": {
-							"vector": [1, 1, 1]
-						}
-					}
+				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "examine"
 				}
 			},
 			"particle_effects": {
-				"0.0": {
+				"2.5": {
 					"effect": "heart",
-					"locator": "headParticles"
+					"locator": "headparticles"
 				}
 			}
 		},
@@ -4486,7 +4374,7 @@
 						}
 					}
 				},
-				"bipedArmRight": {
+				"armRight": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0]
@@ -4521,7 +4409,7 @@
 						}
 					}
 				},
-				"bipedHandRight": {
+				"handRight": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0]
@@ -4547,7 +4435,7 @@
 						}
 					}
 				},
-				"headParticles": {
+				"headparticles": {
 					"rotation": {
 						"vector": [0, 0, 0]
 					},
@@ -4557,56 +4445,17 @@
 					"scale": {
 						"vector": [1, 1, 1]
 					}
-				},
-				"noseParticles": {
-					"rotation": {
-						"0.0": {
-							"vector": [0, 0, 0]
-						},
-						"0.25": {
-							"vector": [0, 0, 0]
-						},
-						"0.5": {
-							"vector": [0, 0, 0]
-						},
-						"3.0": {
-							"vector": [0, 0, 0]
-						}
-					},
-					"position": {
-						"0.0": {
-							"vector": [0, 0, 0]
-						},
-						"0.25": {
-							"vector": [0, 0, 0]
-						},
-						"0.5": {
-							"vector": [0, 0, 0]
-						},
-						"3.0": {
-							"vector": [0, 0, 0]
-						}
-					},
-					"scale": {
-						"0.0": {
-							"vector": [1, 1, 1]
-						},
-						"0.25": {
-							"vector": [1, 1, 1]
-						},
-						"0.5": {
-							"vector": [1, 1, 1]
-						},
-						"3.0": {
-							"vector": [1, 1, 1]
-						}
-					}
+				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "examine"
 				}
 			},
 			"particle_effects": {
-				"0.0": {
-					"effect": "angry_villager",
-					"locator": "headParticles"
+				"2.5": {
+					"effect": "angry",
+					"locator": "headparticles"
 				}
 			}
 		},

@@ -23,5 +23,230 @@
         "weight": 6
       }
     ]
+  },
+  "todepiglinmerchant_hurt": {
+    "subtitle": "subtitles.todepiglins.todepiglinmerchant_hurt",
+    "sounds": [
+      {
+        "name": "todepiglins:todepiglinmerchant_hurt",
+        "weight": 1
+      },
+      {
+        "name": "minecraft:mob/piglin/hurt1",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/hurt2",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/hurt3",
+        "weight": 6
+      }
+    ]
+  },
+  "todepiglinmerchant_death": {
+    "subtitle": "subtitles.todepiglins.todepiglinmerchant_death",
+    "sounds": [
+      {
+        "name": "todepiglins:todepiglinmerchant_death",
+        "weight": 1
+      },
+      {
+        "name": "minecraft:mob/piglin/death1",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/death2",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/death3",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/death4",
+        "weight": 6
+      }
+    ]
+  },
+  "todepiglinmerchant_step": {
+    "subtitle": "subtitles.todepiglins.todepiglinmerchant_step",
+    "sounds": [
+      {
+        "name": "todepiglins:todepiglinmerchant_step",
+        "weight": 1
+      },
+      {
+        "name": "minecraft:mob/piglin/step1",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/step2",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/step3",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/step4",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/step5",
+        "weight": 6
+      }
+    ]
+  },
+  "todepiglinmerchant_retreat": {
+    "subtitle": "subtitles.todepiglins.todepiglinmerchant_retreat",
+    "sounds": [
+      {
+        "name": "todepiglins:todepiglinmerchant_step",
+        "weight": 1
+      },
+      {
+        "name": "minecraft:mob/piglin/retreat1",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/retreat2",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/retreat3",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/retreat4",
+        "weight": 6
+      }
+    ]
+  },
+  "todepiglinmerchant_jealous": {
+    "subtitle": "subtitles.todepiglins.todepiglinmerchant_jealous",
+    "sounds": [
+      {
+        "name": "todepiglins:todepiglinmerchant_jealous",
+        "weight": 1
+      },
+      {
+        "name": "minecraft:mob/piglin/jealous1",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/jealous2",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/jealous3",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/jealous4",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/jealous5",
+        "weight": 6
+      }
+    ]
+  },
+  "todepiglinmerchant_ambient": {
+    "subtitle": "subtitles.todepiglins.todepiglinmerchant_ambient",
+    "sounds": [
+      {
+        "name": "todepiglins:todepiglinmerchant_ambient",
+        "weight": 1
+      },
+      {
+        "name": "minecraft:mob/piglin/idle1",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/idle2",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/idle3",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/idle4",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/idle5",
+        "weight": 6
+      }
+    ]
+  },
+  "todepiglinmerchant_celebrate": {
+    "subtitle": "subtitles.todepiglins.todepiglinmerchant_celebrates",
+    "sounds": [
+      {
+        "name": "todepiglins:todepiglinmerchant_celebrate",
+        "weight": 1
+      },
+      {
+        "name": "minecraft:mob/piglin/celebrate1",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/celebrate2",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/celebrate3",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/celebrate4",
+        "weight": 6
+      }
+    ]
+  },
+  "todepiglinmerchant_anger": {
+    "subtitle": "subtitles.todepiglins.todepiglinmerchant_anger",
+    "sounds": [
+      {
+        "name": "todepiglins:todepiglinmerchant_anger",
+        "weight": 1
+      },
+      {
+        "name": "minecraft:mob/piglin/angry1",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/angry2",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/angry3",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/angry4",
+        "weight": 6
+      }
+    ]
+  },
+  "todepiglinmerchant_examine": {
+    "subtitle": "subtitles.todepiglins.todepiglinmerchant_examine",
+    "sounds": [
+      {
+        "name": "todepiglins:todepiglinmerchant_examine",
+        "weight": 1
+      },
+      {
+        "name": "minecraft:mob/piglin/admire1",
+        "weight": 6
+      },
+      {
+        "name": "minecraft:mob/piglin/admire2",
+        "weight": 6
+      }
+    ]
   }
 }
