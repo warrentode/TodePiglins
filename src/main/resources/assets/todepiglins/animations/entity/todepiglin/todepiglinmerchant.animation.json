@@ -2387,6 +2387,16 @@
 				"0.25": {
 					"effect": "celebrate"
 				}
+			},
+			"particle_effects": {
+				"0.5": {
+					"effect": "note",
+					"locator": "noseparticles"
+				},
+				"1.0": {
+					"effect": "note",
+					"locator": "noseparticles"
+				}
 			}
 		},
 		"nod_yes": {

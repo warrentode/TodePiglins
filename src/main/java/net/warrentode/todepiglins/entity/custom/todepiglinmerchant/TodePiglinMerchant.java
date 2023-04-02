@@ -591,6 +591,8 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
                 this, "meleeController", 0, this::meleePredicate);
 
         admireController.registerParticleListener(this);
+        danceController.registerParticleListener(this);
+
         admireController.registerSoundListener(this::soundListener);
         danceController.registerSoundListener(this::soundListener);
 
@@ -641,6 +643,18 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
                 vec31 = vec31.yRot(-this.yBodyRot * ((float) Math.PI / 180F));
                 vec31 = vec31.add(this.getX(), this.getEyeY() - 0.2D, this.getZ());
                 this.level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), vec31.x, vec31.y, vec31.z, vec3.x, vec3.y + 0.05D, vec3.z);
+            }
+        }
+        else if (getArmPose() == TodePiglinMerchantArmPose.DANCING) {
+            for (int i = 0; i < 360; i++) {
+                Vec3 vec3 = new Vec3(((double) this.random.nextFloat() - 0.5D) * 0.1D, Math.random() * 0.1D + 0.1D, ((double) this.random.nextFloat() - 0.5D) * 0.1D);
+                vec3 = vec3.xRot(-this.getXRot() * ((float) Math.PI / 180F));
+                vec3 = vec3.yRot(-this.getYRot() * ((float) Math.PI / 180F));
+                double d0 = (double) (-this.random.nextFloat()) * 0.6D - 0.3D;
+                Vec3 vec31 = new Vec3(((double) this.random.nextFloat() - 0.5D) * 0.8D, d0, 1.0D + ((double) this.random.nextFloat() - 0.5D) * 0.4D);
+                vec31 = vec31.yRot(-this.yBodyRot * ((float) Math.PI / 180F));
+                vec31 = vec31.add(this.getX(), this.getEyeY() - 0.2D, this.getZ());
+                this.level.addParticle(ParticleTypes.NOTE, vec31.x, vec31.y, vec31.z, vec3.x, vec3.y + 0.05D, vec3.z);
             }
         }
     }

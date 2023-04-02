@@ -6,7 +6,7 @@ plugins {
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
-version = '1.19.2-0.0.8'
+version = '1.19.2-0.0.10'
 group = 'net.warrentode.todepiglins'
 archivesBaseName = 'todepiglins'
 
