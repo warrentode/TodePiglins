@@ -3657,7 +3657,7 @@
 			"particle_effects": {
 				"2.5": {
 					"effect": "angry",
-					"locator": "headparticles"
+					"locator": "noseparticles"
 				}
 			}
 		},
@@ -3980,7 +3980,7 @@
 						}
 					}
 				},
-				"armRight": {
+				"bipedArmRight": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0]
@@ -4015,7 +4015,7 @@
 						}
 					}
 				},
-				"handRight": {
+				"bipedHandRight": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0]
@@ -4061,7 +4061,7 @@
 			"particle_effects": {
 				"2.5": {
 					"effect": "heart",
-					"locator": "headparticles"
+					"locator": "noseparticles"
 				}
 			}
 		},
@@ -4384,7 +4384,7 @@
 						}
 					}
 				},
-				"armRight": {
+				"bipedArmRight": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0]
@@ -4419,7 +4419,7 @@
 						}
 					}
 				},
-				"handRight": {
+				"bipedHandRight": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0]
@@ -4648,7 +4648,7 @@
 						}
 					}
 				},
-				"head": {
+				"bipedHead": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0]
@@ -4788,7 +4788,7 @@
 						}
 					}
 				},
-				"armLeft": {
+				"bipedArmLeft": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0]
@@ -4823,7 +4823,7 @@
 						}
 					}
 				},
-				"handLeft": {
+				"bipedHandLeft": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0]
@@ -5452,7 +5452,7 @@
 						}
 					}
 				},
-				"head": {
+				"bipedHead": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0]
@@ -5592,7 +5592,7 @@
 						}
 					}
 				},
-				"armRight": {
+				"bipedArmRight": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0]
@@ -5627,7 +5627,7 @@
 						}
 					}
 				},
-				"handRight": {
+				"bipedHandRight": {
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0]
@@ -6134,6 +6134,12 @@
 						"vector": [1, 1, 1]
 					}
 				}
+			},
+			"particle_effects": {
+				"0.0": {
+					"effect": "smoke",
+					"locator": "noseparticles"
+				}
 			}
 		},
 		"melee_right": {
@@ -6324,6 +6330,12 @@
 					"scale": {
 						"vector": [1, 1, 1]
 					}
+				}
+			},
+			"particle_effects": {
+				"0.0": {
+					"effect": "smoke",
+					"locator": "noseparticles"
 				}
 			}
 		}

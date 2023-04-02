@@ -592,6 +592,7 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
 
         admireController.registerParticleListener(this);
         danceController.registerParticleListener(this);
+        meleeController.registerParticleListener(this);
 
         admireController.registerSoundListener(this::soundListener);
         danceController.registerSoundListener(this::soundListener);
@@ -619,19 +620,25 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
         ItemStack stack = this.getOffhandItem();
         if (getArmPose() == TodePiglinMerchantArmPose.ACCEPT_ITEM) {
             for (int i = 0; i < 7; ++i) {
-                double d0 = this.random.nextGaussian() * 0.01D;
-                double d1 = this.random.nextGaussian() * 0.01D;
-                double d2 = this.random.nextGaussian() * 0.01D;
-                this.level.addParticle(ParticleTypes.HAPPY_VILLAGER, this.getRandomX(1.0D), this.getRandomY() + 0.2D, this.getRandomZ(1.0D), d0, d1, d2);
-            }
+                Vec3 vec3 = new Vec3(((double) this.random.nextFloat() - 0.5D) * 0.1D, Math.random() * 0.1D + 0.1D, ((double) this.random.nextFloat() - 0.5D) * 0.1D);
+                vec3 = vec3.xRot(-this.getXRot() * ((float) Math.PI / 180F));
+                vec3 = vec3.yRot(-this.getYRot() * ((float) Math.PI / 180F));
+                double d0 = (double) (-this.random.nextFloat()) * 0.6D - 0.3D;
+                Vec3 vec31 = new Vec3(((double) this.random.nextFloat() - 0.5D) * 0.8D, d0, 1.0D + ((double) this.random.nextFloat() - 0.5D) * 0.4D);
+                vec31 = vec31.yRot(-this.yBodyRot * ((float) Math.PI / 180F));
+                vec31 = vec31.add(this.getX(), this.getEyeY() - 0.2D, this.getZ());
+                this.level.addParticle(ParticleTypes.GLOW, vec31.x, vec31.y, vec31.z, vec3.x, vec3.y + 0.05D, vec3.z);}
         }
         else if (getArmPose() == TodePiglinMerchantArmPose.REJECT_ITEM) {
             for (int i = 0; i < 7; ++i) {
-                double d0 = this.random.nextGaussian() * 0.01D;
-                double d1 = this.random.nextGaussian() * 0.01D;
-                double d2 = this.random.nextGaussian() * 0.01D;
-                this.level.addParticle(ParticleTypes.ANGRY_VILLAGER, this.getRandomX(1.0D), this.getRandomY() + 0.2D, this.getRandomZ(1.0D), d0, d1, d2);
-            }
+                Vec3 vec3 = new Vec3(((double) this.random.nextFloat() - 0.5D) * 0.1D, Math.random() * 0.1D + 0.1D, ((double) this.random.nextFloat() - 0.5D) * 0.1D);
+                vec3 = vec3.xRot(-this.getXRot() * ((float) Math.PI / 180F));
+                vec3 = vec3.yRot(-this.getYRot() * ((float) Math.PI / 180F));
+                double d0 = (double) (-this.random.nextFloat()) * 0.6D - 0.3D;
+                Vec3 vec31 = new Vec3(((double) this.random.nextFloat() - 0.5D) * 0.8D, d0, 1.0D + ((double) this.random.nextFloat() - 0.5D) * 0.4D);
+                vec31 = vec31.yRot(-this.yBodyRot * ((float) Math.PI / 180F));
+                vec31 = vec31.add(this.getX(), this.getEyeY() - 0.2D, this.getZ());
+                this.level.addParticle(ParticleTypes.SPIT, vec31.x, vec31.y, vec31.z, vec3.x, vec3.y + 0.05D, vec3.z);}
         }
         else if (getArmPose() == TodePiglinMerchantArmPose.EAT) {
             for (int i = 0; i < 7; ++i) {
@@ -646,7 +653,7 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
             }
         }
         else if (getArmPose() == TodePiglinMerchantArmPose.DANCING) {
-            for (int i = 0; i < 360; i++) {
+            for (int i = 0; i < 7; ++i) {
                 Vec3 vec3 = new Vec3(((double) this.random.nextFloat() - 0.5D) * 0.1D, Math.random() * 0.1D + 0.1D, ((double) this.random.nextFloat() - 0.5D) * 0.1D);
                 vec3 = vec3.xRot(-this.getXRot() * ((float) Math.PI / 180F));
                 vec3 = vec3.yRot(-this.getYRot() * ((float) Math.PI / 180F));
@@ -655,6 +662,18 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
                 vec31 = vec31.yRot(-this.yBodyRot * ((float) Math.PI / 180F));
                 vec31 = vec31.add(this.getX(), this.getEyeY() - 0.2D, this.getZ());
                 this.level.addParticle(ParticleTypes.NOTE, vec31.x, vec31.y, vec31.z, vec3.x, vec3.y + 0.05D, vec3.z);
+            }
+        }
+        else if (getArmPose() == TodePiglinMerchantArmPose.ATTACKING_WITH_MELEE_WEAPON) {
+            for (int i = 0; i < 7; ++i) {
+                Vec3 vec3 = new Vec3(((double) this.random.nextFloat() - 0.5D) * 0.1D, Math.random() * 0.1D + 0.1D, ((double) this.random.nextFloat() - 0.5D) * 0.1D);
+                vec3 = vec3.xRot(-this.getXRot() * ((float) Math.PI / 180F));
+                vec3 = vec3.yRot(-this.getYRot() * ((float) Math.PI / 180F));
+                double d0 = (double) (-this.random.nextFloat()) * 0.6D - 0.3D;
+                Vec3 vec31 = new Vec3(((double) this.random.nextFloat() - 0.5D) * 0.8D, d0, 1.0D + ((double) this.random.nextFloat() - 0.5D) * 0.4D);
+                vec31 = vec31.yRot(-this.yBodyRot * ((float) Math.PI / 180F));
+                vec31 = vec31.add(this.getX(), this.getEyeY() - 0.2D, this.getZ());
+                this.level.addParticle(ParticleTypes.SNEEZE, vec31.x, vec31.y, vec31.z, vec3.x, vec3.y + 0.05D, vec3.z);
             }
         }
     }
@@ -836,11 +855,11 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
             todePiglinMerchant.setItemInHand(InteractionHand.OFF_HAND, stack);
             todePiglinMerchant.setItemSlot(EquipmentSlot.OFFHAND, stack);
             todePiglinMerchant.setGuaranteedDrop(EquipmentSlot.OFFHAND);
-            todePiglinMerchant.swing(InteractionHand.OFF_HAND);
+            todePiglinMerchant.swing(InteractionHand.OFF_HAND, true);
         }
         else {
             todePiglinMerchant.setItemSlotAndDropWhenKilled(EquipmentSlot.OFFHAND, stack);
-            todePiglinMerchant.swing(InteractionHand.OFF_HAND);
+            todePiglinMerchant.swing(InteractionHand.OFF_HAND, true);
         }
     }
     private static @NotNull ItemStack removeOneItemFromItemEntity(@NotNull ItemEntity itemEntity) {
@@ -936,6 +955,7 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
         }
         else if (EatFood.isFood(stack) && EatFood.hasNotEatenRecently(this)) {
             holdInOffhand(this, itemEntity.getItem());
+            this.swing(InteractionHand.OFF_HAND, true);
             EatFood.eat( this);
         }
         else if (EatFood.isFood(stack) && !EatFood.hasNotEatenRecently(this)) {
@@ -1007,7 +1027,7 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     }
     private static void throwItemsTowardPos(@NotNull TodePiglinMerchant todePiglinMerchant, @NotNull List<ItemStack> stacks, Vec3 pPos) {
         if (!stacks.isEmpty()) {
-            todePiglinMerchant.swing(InteractionHand.OFF_HAND);
+            todePiglinMerchant.swing(InteractionHand.OFF_HAND, true);
             for(ItemStack itemstack : stacks) {
                 BehaviorUtils.throwItem(todePiglinMerchant, itemstack, pPos.add(0.0D, 1.0D, 0.0D));
             }

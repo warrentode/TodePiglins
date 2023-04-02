@@ -42,7 +42,7 @@ public class EatFood extends ExtendedBehaviour<TodePiglinMerchant> {
         return todePiglinMerchant.foodLevel;
     }
 
-    public static boolean eat(@NotNull TodePiglinMerchant todePiglinMerchant) {
+    public static void eat(@NotNull TodePiglinMerchant todePiglinMerchant) {
         int i = 0;
         ItemStack stack = todePiglinMerchant.getInventory().getItem(i);
         if ((todePiglinMerchant.getHealth() < todePiglinMerchant.getMaxHealth())
@@ -55,7 +55,7 @@ public class EatFood extends ExtendedBehaviour<TodePiglinMerchant> {
 
                         for (int k = j; k > 0; --k) {
                             if (!hasNotEatenRecently(todePiglinMerchant)) {
-                                return true;
+                                return;
                             }
                             else {
                                 todePiglinMerchant.setIsEating(true);
@@ -69,7 +69,6 @@ public class EatFood extends ExtendedBehaviour<TodePiglinMerchant> {
                 }
             }
         }
-        return false;
     }
 
     @Override
