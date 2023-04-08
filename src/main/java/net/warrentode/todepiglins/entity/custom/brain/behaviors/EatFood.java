@@ -1,4 +1,4 @@
-package net.warrentode.todepiglins.entity.custom.brain.behaviors.food;
+package net.warrentode.todepiglins.entity.custom.brain.behaviors;
 
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;

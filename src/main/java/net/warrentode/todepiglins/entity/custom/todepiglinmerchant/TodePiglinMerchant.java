@@ -7,10 +7,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.RandomSource;
@@ -38,6 +40,7 @@ import net.minecraft.world.entity.monster.*;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.npc.InventoryCarrier;
+import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.item.ItemStack;
@@ -45,6 +48,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.trading.Merchant;
+import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -83,6 +89,9 @@ import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyLivingEntitySensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyPlayersSensor;
 import net.tslat.smartbrainlib.util.BrainUtils;
 import net.warrentode.todepiglins.client.todepiglinmerchant.TodePiglinMerchantArmPose;
+import net.warrentode.todepiglins.entity.ModEntityTypes;
+import net.warrentode.todepiglins.entity.custom.brain.behaviors.EatFood;
+import net.warrentode.todepiglins.entity.custom.brain.behaviors.LookAndFollowTradingPlayerSink;
 import net.warrentode.todepiglins.entity.custom.brain.behaviors.StartDancing;
 import net.warrentode.todepiglins.entity.custom.brain.behaviors.bartering.StartAdmiring;
 import net.warrentode.todepiglins.entity.custom.brain.behaviors.bartering.StopAdmireTired;
@@ -90,12 +99,13 @@ import net.warrentode.todepiglins.entity.custom.brain.behaviors.bartering.StopAd
 import net.warrentode.todepiglins.entity.custom.brain.behaviors.bartering.StopHoldingAndBarter;
 import net.warrentode.todepiglins.entity.custom.brain.behaviors.combat.SetAngerTarget;
 import net.warrentode.todepiglins.entity.custom.brain.behaviors.combat.StopAngerUponDeadTarget;
-import net.warrentode.todepiglins.entity.custom.brain.behaviors.food.EatFood;
 import net.warrentode.todepiglins.entity.custom.brain.behaviors.hunting.RememberDeadHoglin;
 import net.warrentode.todepiglins.entity.custom.brain.sensors.NearestWantedItemSensor;
 import net.warrentode.todepiglins.entity.custom.brain.sensors.TodePiglinBarterCurrencySensor;
 import net.warrentode.todepiglins.entity.custom.brain.sensors.TodePiglinSpecificSensor;
 import net.warrentode.todepiglins.sounds.ModSounds;
+import net.warrentode.todepiglins.trades.*;
+import net.warrentode.todepiglins.util.Config;
 import net.warrentode.todepiglins.util.ModTags;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib3.core.AnimationState;
@@ -112,16 +122,15 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static net.warrentode.todepiglins.entity.custom.brain.sensors.TodePiglinBarterCurrencySensor.isLovedItem;
 import static net.warrentode.todepiglins.entity.custom.brain.sensors.TodePiglinBarterCurrencySensor.isWantedItem;
 import static software.bernie.geckolib3.core.builder.ILoopType.EDefaultLoopTypes.*;
 
-public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodePiglinMerchant>, IAnimatable, IParticleListener<TodePiglinMerchant>, InventoryCarrier {
+public class TodePiglinMerchant extends PathfinderMob implements SmartBrainOwner<TodePiglinMerchant>, Merchant, IAnimatable, IParticleListener<TodePiglinMerchant>, InventoryCarrier {
     private static final EntityDataAccessor<Boolean> DATA_IS_DANCING =
             SynchedEntityData.defineId(TodePiglinMerchant.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_CANNOT_HUNT =
@@ -164,6 +173,12 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     public static final double DESIRED_AVOID_DISTANCE = 12.0D;
     private static final float SPEED_IDLE = 0.6F;
     public int foodLevel;
+    @Nullable
+    private Player tradingPlayer;
+    @Nullable
+    private MerchantOffers offers;
+    private int despawnDelay;
+    private int restockDelay;
     public static @NotNull Ingredient getBarterItems() {
         return Ingredient.of(ModTags.Items.PIGLIN_BARTER_ITEMS);
     }
@@ -204,9 +219,7 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
         this.populateDefaultEquipmentEnchantments(randomsource, pDifficulty);
         return super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData, nbtTag);
     }
-    protected boolean shouldDespawnInPeaceful() {
-        return false;
-    }
+
     public boolean removeWhenFarAway(double pDistanceToClosestPlayer) {
         return false;
     }
@@ -230,11 +243,9 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     public boolean isPreventingPlayerRest(@NotNull Player pPlayer) {
         return false;
     }
-
     public int getExperienceReward() {
         return this.xpReward;
     }
-
     protected void dropCustomDeathLoot(@NotNull DamageSource pSource, int pLooting, boolean pRecentlyHit) {
         super.dropCustomDeathLoot(pSource, pLooting, pRecentlyHit);
         this.inventory.removeAllItems().forEach(this::spawnAtLocation);
@@ -365,11 +376,26 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
         if (pCompound.contains("FoodLevel", 1)) {
             this.foodLevel = pCompound.getByte("FoodLevel");
         }
+        if (pCompound.contains("Offers", 10)) {
+            this.offers = new TodePiglinMerchantOffers(pCompound.getCompound("Offers"));
+        }
+        if (pCompound.contains("DespawnDelay", Tag.TAG_INT)) {
+            this.despawnDelay = pCompound.getInt("DespawnDelay");
+        }
+        if (pCompound.contains("RestockDelay", Tag.TAG_INT)) {
+            this.restockDelay = pCompound.getInt("RestockDelay");
+        }
     }
     public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
         pCompound.put("Inventory", this.inventory.createTag());
         pCompound.putByte("FoodLevel", (byte)this.foodLevel);
+        MerchantOffers offers = this.getOffers();
+        if (!offers.isEmpty()) {
+            pCompound.put("Offers", offers.createTag());
+        }
+        pCompound.putInt("DespawnDelay", this.despawnDelay);
+        pCompound.putInt("RestockDelay", this.restockDelay);
     }
 
     // TODO consider bringing in Hoglin riding as your son requested
@@ -428,6 +454,7 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
                         .whenStarting((TodePiglinMerchant) -> playRetreatSound(this.getOnPos(), this.getBlockStateOn())),
                 new SetWalkTargetAwayFrom<>(MemoryModuleType.NEAREST_REPELLENT,
                         SPEED_MULTIPLIER_WHEN_AVOIDING, DESIRED_DISTANCE_FROM_REPELLENT, false, Vec3::atBottomCenterOf),
+                new LookAndFollowTradingPlayerSink(SPEED_IDLE),
                 new FirstApplicableBehaviour<>(
                         new StartAdmiring(ADMIRE_DURATION),
                         new StopAdmiringTooFar(MAX_ADMIRE_DISTANCE),
@@ -436,10 +463,6 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
                 )
         );
     }
-    // TODO mix it up a bit with the Dance task
-    //  - maybe a few different animations to randomize?
-    //  or specific ones in response to certain events?
-    //  maybe even randomize the timer a bit?
     @Override
     public BrainActivityGroup<TodePiglinMerchant> getIdleTasks() {
         // noinspection unchecked
@@ -453,10 +476,12 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
                                                 !(target instanceof Zombie) &&
                                                 !(target instanceof ZombieHorse) &&
                                                 !(target instanceof Zoglin) &&
-                                                !(target.isBaby())
+                                                !(target.isBaby()) &&
+                                                !(target instanceof ServerPlayer serverPlayer && TodePiglinSpecificSensor.isWearingFriendlyGear(serverPlayer)) &&
+                                                !(target instanceof ServerPlayer overworldPlayer && this.level.dimension() == Level.OVERWORLD) &&
+                                                !((target instanceof Hoglin) && (TodePiglinSpecificSensor.getVisibleHoglinCount(this) <= 2))
                                 )
                                 .useMemory(MemoryModuleType.HURT_BY_ENTITY)
-                                .useMemory(MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD)
                                 .useMemory(MemoryModuleType.NEAREST_VISIBLE_HUNTABLE_HOGLIN)
                                 .useMemory(MemoryModuleType.NEAREST_VISIBLE_NEMESIS)
                                 .isAllyIf(TodePiglinSpecificSensor::isAlliedTo)
@@ -540,6 +565,19 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
             }
         }
 
+        // AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
+        if (!this.level.isClientSide() && (!Config.COMMON.preventDespawnIfNamed.get() || !this.isPersistenceRequired())) {
+            this.handleDespawn();
+        }
+
+        // AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
+        if (!this.level.isClientSide() && this.getMaxRestockDelay() != -1) {
+            if (++this.restockDelay >= this.getMaxRestockDelay()) {
+                this.getOffers().forEach(MerchantOffer::resetUses);
+                this.restockDelay = 0;
+            }
+        }
+
         setWillingToBarter(!BrainUtils.hasMemory(this, MemoryModuleType.DANCING));
 
         setHoldingItem(isHoldingItemInOffHand(this));
@@ -572,6 +610,12 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     }
     protected void playAmbientSound(@NotNull BlockPos pPos, @NotNull BlockState pBlock) {
         this.playSound(ModSounds.TODEPIGLINMERCHANT_AMBIENT.get(), 0.15F, 1.0F);
+    }
+    protected SoundEvent getTradeUpdatedSound(boolean likesOffer) {
+        return likesOffer ? ModSounds.TODEPIGLINMERCHANT_CELEBRATE.get() : ModSounds.TODEPIGLINMERCHANT_EXAMINE.get();
+    }
+    public @NotNull SoundEvent getNotifyTradeSound() {
+        return ModSounds.TODEPIGLINMERCHANT_CELEBRATE.get();
     }
 
     /** ANIMATION BLOCK START **/
@@ -653,7 +697,7 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
             }
         }
         else if (getArmPose() == TodePiglinMerchantArmPose.DANCING) {
-            for (int i = 0; i < 7; ++i) {
+            for (int i = 0; i < 1; ++i) {
                 Vec3 vec3 = new Vec3(((double) this.random.nextFloat() - 0.5D) * 0.1D, Math.random() * 0.1D + 0.1D, ((double) this.random.nextFloat() - 0.5D) * 0.1D);
                 vec3 = vec3.xRot(-this.getXRot() * ((float) Math.PI / 180F));
                 vec3 = vec3.yRot(-this.getYRot() * ((float) Math.PI / 180F));
@@ -803,24 +847,14 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
         return RandomSource.create(todePiglinMerchant.level.getGameTime()).nextFloat() < PROBABILITY_OF_CELEBRATION_DANCE;
     }
 
-    // TODO setup custom trades
-    /** this may also be where right-clicking empty-handed opens up a trade or bartering window?
-     * creating a bartering GUI might bypass a lot of issues actually -
-     * at first it seemed weird to me that this takes two separate methods to make this exchange happen
-     * but when I got to looking at them together in the same file next to each other, what I see happening
-     * is a couple of checks being made, one primary check for server side and the other being made
-     * for whatever the entity is holding -
-     * to compare this with something like a furnace, one method is basic happening before opening the GUI
-     * and the other happens after it's opened (I think)
-     * in any case, whenever I try to tinker with it, it becomes a pain so for now I'm going to leave it as they are
-     * with this note until I decide if it needs to stay as is or be changed **/
+    /** this is where the player either gives an item to barter or opens the trade menu **/
     public @NotNull InteractionResult mobInteract(@NotNull Player player, @NotNull InteractionHand hand) {
         InteractionResult interactionresult = super.mobInteract(player, hand);
+        ItemStack itemStack = player.getItemInHand(hand);
         if (interactionresult.consumesAction()) {
             return interactionresult;
         }
         else if (!this.level.isClientSide) {
-            ItemStack itemStack = player.getItemInHand(hand);
             if (TodePiglinBarterCurrencySensor.canAdmire(this, itemStack)) {
                 ItemStack itemStack1 = itemStack.split(1);
                 holdInOffhand(this, itemStack1);
@@ -828,6 +862,17 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
                 stopWalking(this);
                 setHoldingItem(true);
                 return InteractionResult.CONSUME;
+            }
+            else if (player.getOffhandItem().isEmpty() && !isTrading() && !isDancing() && !isEating() && isWillingToBarter()) {
+                if (this.getOffers().isEmpty()) {
+                    return InteractionResult.sidedSuccess(this.level.isClientSide());
+                }
+                else if (!this.level.isClientSide() && player.getItemInHand(hand).isEmpty() && (this.getLastHurtByMob() == null || this.getLastHurtByMob() != player)) {
+                    setWillingToBarter(false);
+                    this.setTradingPlayer(player);
+                    this.openTradingScreen(player, this.getDisplayName(), 1);
+                }
+                return InteractionResult.sidedSuccess(this.level.isClientSide());
             }
             else {
                 return InteractionResult.PASS;
@@ -838,7 +883,7 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
             //may need to come back to edit this for barter currency specifically?
             boolean flag = TodePiglinBarterCurrencySensor.canAdmire(this, player.getItemInHand(hand)) &&
                     !isWantedItem(this.getOffhandItem()) && !BrainUtils.hasMemory(this, MemoryModuleType.DANCING) &&
-                    isWillingToBarter();
+                    isWillingToBarter() && !isTrading();
             return flag ? InteractionResult.SUCCESS : InteractionResult.PASS;
         }
     }
@@ -999,7 +1044,8 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
             }
         }
     }
-    // TODO setup a custom bartering loot tier  system
+    // TODO
+    //  setup a custom bartering loot tier  system
     /** if I can get the custom currency working then maybe I can then get custom loot tables running too
      * it's very likely that I can get this running with the sensor **/
     private static @NotNull List<ItemStack> getBarterResponseItems(@NotNull TodePiglinMerchant todePiglinMerchant) {
@@ -1028,7 +1074,7 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
     private static void throwItemsTowardPos(@NotNull TodePiglinMerchant todePiglinMerchant, @NotNull List<ItemStack> stacks, Vec3 pPos) {
         if (!stacks.isEmpty()) {
             todePiglinMerchant.swing(InteractionHand.OFF_HAND, true);
-            for(ItemStack itemstack : stacks) {
+            for (ItemStack itemstack : stacks) {
                 BehaviorUtils.throwItem(todePiglinMerchant, itemstack, pPos.add(0.0D, 1.0D, 0.0D));
             }
         }
@@ -1072,6 +1118,127 @@ public class TodePiglinMerchant extends Monster implements SmartBrainOwner<TodeP
             else {
                 SetAngerTarget.maybeRetaliate(todePiglinMerchant, hurtBy);
             }
+        }
+    }
+
+    /** MERCHANT TRADING BLOCK **/
+    @Override
+    public void setTradingPlayer(@Nullable Player pTradingPlayer) {
+        this.tradingPlayer = pTradingPlayer;
+    }
+    @Nullable
+    @Override
+    public Player getTradingPlayer() {
+        return this.tradingPlayer;
+    }
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean isTrading() {
+        return this.tradingPlayer != null;
+    }
+    @Override
+    public @NotNull MerchantOffers getOffers() {
+        if (this.offers == null) {
+            this.offers = new TodePiglinMerchantOffers();
+            this.populateTradeData();
+        }
+        return this.offers;
+    }
+    // AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
+    protected void populateTradeData() {
+        MerchantOffers offers = this.getOffers();
+        EntityTrades entityTrades = TradeManager.instance().getTrades(ModEntityTypes.TODEPIGLINMERCHANT.get());
+        if (entityTrades != null) {
+            Map<TradeRarity, List<VillagerTrades.ItemListing>> tradeMap = entityTrades.tradeMap();
+            for (TradeRarity rarity : TradeRarity.values()) {
+                IRaritySettings settings = Config.COMMON.todePiglinMerchant.trades.getSettings(rarity);
+                if (settings.includeChance() <= 0.0) {
+                    continue;
+                }
+                if (settings.includeChance() < 1.0 && this.getRandom().nextDouble() > settings.includeChance()) {
+                    continue;
+                }
+                List<VillagerTrades.ItemListing> trades = tradeMap.get(rarity);
+                int min = Math.min(settings.getMinValue(), settings.getMaxValue());
+                int max = Math.max(settings.getMinValue(), settings.getMaxValue());
+                int count = min + this.getRandom().nextInt(max - min + 1);
+                this.addTrades(offers, trades, count, rarity.shouldShuffle());
+            }
+        }
+    }
+    // AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
+    protected void addTrades(MerchantOffers offers, @Nullable List<VillagerTrades.ItemListing> trades, int max, boolean shuffle) {
+        if (trades == null) {
+            return;
+        }
+
+        List<Integer> randomIndexes = IntStream.range(0, trades.size()).boxed().collect(Collectors.toList());
+        if (shuffle) {
+            Collections.shuffle(randomIndexes);
+        }
+
+        randomIndexes = randomIndexes.subList(0, Math.min(trades.size(), max));
+        for (Integer index : randomIndexes) {
+            VillagerTrades.ItemListing trade = trades.get(index);
+            MerchantOffer offer = trade.getOffer(this, this.getRandom());
+            if (offer != null) {
+                offers.add(offer);
+            }
+        }
+    }
+    @Override
+    public void overrideOffers(@NotNull MerchantOffers pOffers) {}
+    @Override
+    public void notifyTrade(@NotNull MerchantOffer pOffer) {
+        pOffer.increaseUses();
+        if (this.level instanceof ServerLevel) {
+            ExperienceOrb.award((ServerLevel) this.level, this.getPosition(1F), pOffer.getXp());
+        }
+    }
+    @Override
+    public void notifyTradeUpdated(@NotNull ItemStack pStack) {
+        if (!this.level.isClientSide && this.ambientSoundTime > -this.getAmbientSoundInterval() + 20) {
+            this.ambientSoundTime = -this.getAmbientSoundInterval();
+            this.playSound(this.getTradeUpdatedSound(!pStack.isEmpty()), this.getSoundVolume(), this.getVoicePitch());
+        }
+    }
+    @Override
+    public int getVillagerXp() {
+        return 0;
+    }
+    @Override
+    public void overrideXp(int pXp) {}
+    @Override
+    public boolean showProgressBar() {
+        return false;
+    }
+    @Override
+    public boolean canRestock() {
+        return true;
+    }
+    // AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
+    protected int getMaxRestockDelay() {
+        return Config.COMMON.todePiglinMerchant.restockDelay.get();
+    }
+    @Override
+    public @NotNull Level getLevel() {
+        return super.getLevel();
+    }
+    @Override
+    public boolean isClientSide() {
+        return this.getLevel().isClientSide;
+    }
+    // AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
+    public void setDespawnDelay(int despawnDelay) {
+        this.despawnDelay = despawnDelay;
+    }
+    // AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
+    public int getDespawnDelay() {
+        return this.despawnDelay;
+    }
+    // AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
+    private void handleDespawn() {
+        if(this.despawnDelay > 0 && !this.isTrading() && --this.despawnDelay == 0) {
+            this.remove(RemovalReason.KILLED);
         }
     }
 }

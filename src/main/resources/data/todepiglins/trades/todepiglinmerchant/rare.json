@@ -1,0 +1,77 @@
+{
+  "replace": false,
+  "trades": [
+    {
+      "type": "todepiglins:basic",
+      "experience": 4,
+      "max_trades": 24,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:crimson_nylium"
+      },
+      "payment_item": {
+        "count": 7,
+        "item": "minecraft:gold_nugget"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "experience": 4,
+      "max_trades": 24,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:warped_nylium"
+      },
+      "payment_item": {
+        "count": 7,
+        "item": "minecraft:gold_nugget"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "experience": 4,
+      "max_trades": 8,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:potion",
+        "nbt": "{Potion:\"minecraft:water\"}"
+      },
+      "payment_item": {
+        "count": 5,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.5
+    },
+    {
+      "type": "todepiglins:basic",
+      "experience": 4,
+      "max_trades": 24,
+      "offer_item": {
+        "count": 2,
+        "item": "minecraft:iron_nugget"
+      },
+      "payment_item": {
+        "count": 1,
+        "item": "minecraft:gold_nugget"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "experience": 4,
+      "max_trades": 8,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:potion",
+        "nbt": "{Potion:\"minecraft:fire_resistance\"}"
+      },
+      "payment_item": {
+        "count": 5,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.5
+    }
+  ]
+}

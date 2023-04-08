@@ -1,0 +1,355 @@
+{
+  "replace": false,
+  "trades": [
+    {
+      "type": "todepiglins:basic",
+      "experience": 4,
+      "max_trades": 1,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:music_disc_pigstep"
+      },
+      "payment_item": {
+        "count": 11,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "enchantments": [
+        {
+          "id": "minecraft:fire_protection",
+          "level": 1
+        }
+      ],
+      "experience": 4,
+      "max_trades": 1,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:iron_helmet",
+        "nbt": "{Damage:0}"
+      },
+      "payment_item": {
+        "count": 9,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "enchantments": [
+        {
+          "id": "minecraft:fire_protection",
+          "level": 1
+        }
+      ],
+      "experience": 4,
+      "max_trades": 1,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:iron_chestplate",
+        "nbt": "{Damage:0}"
+      },
+      "payment_item": {
+        "count": 12,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "enchantments": [
+        {
+          "id": "minecraft:fire_protection",
+          "level": 1
+        }
+      ],
+      "experience": 4,
+      "max_trades": 1,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:iron_leggings",
+        "nbt": "{Damage:0}"
+      },
+      "payment_item": {
+        "count": 11,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "enchantments": [
+        {
+          "id": "minecraft:fire_protection",
+          "level": 1
+        }
+      ],
+      "experience": 4,
+      "max_trades": 1,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:iron_boots",
+        "nbt": "{Damage:0}"
+      },
+      "payment_item": {
+        "count": 9,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "enchantments": [
+        {
+          "id": "minecraft:fire_protection",
+          "level": 2
+        }
+      ],
+      "experience": 4,
+      "max_trades": 1,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:iron_helmet",
+        "nbt": "{Damage:0}"
+      },
+      "payment_item": {
+        "count": 12,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "enchantments": [
+        {
+          "id": "minecraft:fire_protection",
+          "level": 2
+        }
+      ],
+      "experience": 4,
+      "max_trades": 1,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:iron_chestplate",
+        "nbt": "{Damage:0}"
+      },
+      "payment_item": {
+        "count": 15,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "enchantments": [
+        {
+          "id": "minecraft:fire_protection",
+          "level": 2
+        }
+      ],
+      "experience": 4,
+      "max_trades": 1,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:iron_leggings",
+        "nbt": "{Damage:0}"
+      },
+      "payment_item": {
+        "count": 14,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "enchantments": [
+        {
+          "id": "minecraft:fire_protection",
+          "level": 2
+        }
+      ],
+      "experience": 4,
+      "max_trades": 1,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:iron_boots",
+        "nbt": "{Damage:0}"
+      },
+      "payment_item": {
+        "count": 12,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "enchantments": [
+        {
+          "id": "minecraft:fire_protection",
+          "level": 3
+        }
+      ],
+      "experience": 4,
+      "max_trades": 1,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:iron_helmet",
+        "nbt": "{Damage:0}"
+      },
+      "payment_item": {
+        "count": 15,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "enchantments": [
+        {
+          "id": "minecraft:fire_protection",
+          "level": 3
+        }
+      ],
+      "experience": 4,
+      "max_trades": 1,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:iron_chestplate",
+        "nbt": "{Damage:0}"
+      },
+      "payment_item": {
+        "count": 18,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "enchantments": [
+        {
+          "id": "minecraft:fire_protection",
+          "level": 3
+        }
+      ],
+      "experience": 4,
+      "max_trades": 1,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:iron_leggings",
+        "nbt": "{Damage:0}"
+      },
+      "payment_item": {
+        "count": 17,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "enchantments": [
+        {
+          "id": "minecraft:fire_protection",
+          "level": 3
+        }
+      ],
+      "experience": 4,
+      "max_trades": 1,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:iron_boots",
+        "nbt": "{Damage:0}"
+      },
+      "payment_item": {
+        "count": 15,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "enchantments": [
+        {
+          "id": "minecraft:fire_protection",
+          "level": 4
+        }
+      ],
+      "experience": 4,
+      "max_trades": 1,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:iron_helmet",
+        "nbt": "{Damage:0}"
+      },
+      "payment_item": {
+        "count": 18,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "enchantments": [
+        {
+          "id": "minecraft:fire_protection",
+          "level": 4
+        }
+      ],
+      "experience": 4,
+      "max_trades": 1,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:iron_chestplate",
+        "nbt": "{Damage:0}"
+      },
+      "payment_item": {
+        "count": 21,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "enchantments": [
+        {
+          "id": "minecraft:fire_protection",
+          "level": 4
+        }
+      ],
+      "experience": 4,
+      "max_trades": 1,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:iron_leggings",
+        "nbt": "{Damage:0}"
+      },
+      "payment_item": {
+        "count": 20,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.0
+    },
+    {
+      "type": "todepiglins:basic",
+      "enchantments": [
+        {
+          "id": "minecraft:fire_protection",
+          "level": 4
+        }
+      ],
+      "experience": 4,
+      "max_trades": 1,
+      "offer_item": {
+        "count": 1,
+        "item": "minecraft:iron_boots",
+        "nbt": "{Damage:0}"
+      },
+      "payment_item": {
+        "count": 18,
+        "item": "minecraft:gold_block"
+      },
+      "price_multiplier": 0.0
+    }
+  ]
+}

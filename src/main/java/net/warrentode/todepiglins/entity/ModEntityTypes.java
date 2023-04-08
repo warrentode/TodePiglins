@@ -17,7 +17,7 @@ public class ModEntityTypes {
 
     public static final RegistryObject<EntityType<TodePiglinMerchant>> TODEPIGLINMERCHANT =
             ENTITY_TYPES.register("todepiglinmerchant",
-                    () -> EntityType.Builder.of(TodePiglinMerchant::new, MobCategory.MONSTER)
+                    () -> EntityType.Builder.of(TodePiglinMerchant::new, MobCategory.MISC)
                             .sized(0.6f, 1.95f)
                             .build(new ResourceLocation(MODID, "todepiglins").toString()));
 

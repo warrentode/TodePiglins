@@ -2,9 +2,9 @@ package net.warrentode.todepiglins.entity.custom.brain.sensors;
 
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,6 +19,8 @@ import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.monster.piglin.PiglinBrute;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CampfireBlock;
@@ -37,7 +39,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static net.warrentode.todepiglins.entity.custom.brain.behaviors.food.EatFood.countFoodPointsInInventory;
+import static net.warrentode.todepiglins.entity.custom.brain.behaviors.EatFood.countFoodPointsInInventory;
 
 public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSensor<E> {
     private static final ImmutableList<MemoryModuleType<?>> MEMORIES =
@@ -112,6 +114,7 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
             LivingEntity zombified = null;
             Player playerNoFriendlyGear = null;
             Player playerWithGoodie = null;
+            Player visiblePlayer = null;
 
             List<TodePiglinMerchant> visibleAdultTodePiglins = new ObjectArrayList<>();
             List<AbstractPiglin> visibleAdultPiglins = new ObjectArrayList<>();
@@ -150,14 +153,17 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
                     }
                 }
                 // PLAYER DETECTION
-                else if (target instanceof LocalPlayer player) {
-                    if (playerNoFriendlyGear == null && !isWearingFriendlyGear(player) && entity.canAttack(player)) {
-                        playerNoFriendlyGear = player;
+                else if (target instanceof ServerPlayer player) {
+                    if (!player.isCreative() && !player.isSpectator()) {
+                        if (playerNoFriendlyGear == null && !isWearingFriendlyGear(player) && entity.canAttack(player)) {
+                            playerNoFriendlyGear = player;
+                        }
                     }
-
-                    if (playerWithGoodie == null && !player.isSpectator() && isPlayerHoldingLovedItem(player)) {
-                        BrainUtils.setMemory(brain, MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM, player);
+                    else if (playerWithGoodie == null && !player.isSpectator() && isPlayerHoldingLovedItem(player)) {
                         playerWithGoodie = player;
+                    }
+                    else if (visiblePlayer == null) {
+                        visiblePlayer = player;
                     }
                 }
                 // DETECT ZOMBIFIED
@@ -183,6 +189,7 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
             // set memories for players
             BrainUtils.setMemory(brain, MemoryModuleType.NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD, playerNoFriendlyGear);
             BrainUtils.setMemory(brain, MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM, playerWithGoodie);
+            BrainUtils.setMemory(brain, MemoryModuleType.NEAREST_VISIBLE_PLAYER, visiblePlayer);
             // set memories for vanilla community
             BrainUtils.setMemory(entity, MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS, visibleAdultPiglins);
             BrainUtils.setMemory(entity, MemoryModuleType.VISIBLE_ADULT_PIGLIN_COUNT, visibleAdultPiglins.size());
@@ -232,6 +239,13 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
 
     public static List<AbstractPiglin> getVisibleAdultPiglins(TodePiglinMerchant todePiglinMerchant) {
         return BrainUtils.getMemory(todePiglinMerchant, MemoryModuleType.NEAREST_VISIBLE_ADULT_PIGLINS);
+    }
+
+    public static Integer getVisibleHoglinCount(TodePiglinMerchant todePiglinMerchant) {
+        if (BrainUtils.getMemory(todePiglinMerchant, MemoryModuleType.VISIBLE_ADULT_HOGLIN_COUNT) != null) {
+            return BrainUtils.getMemory(todePiglinMerchant, MemoryModuleType.VISIBLE_ADULT_HOGLIN_COUNT);
+        }
+        else return 0;
     }
 
     public static boolean hoglinsOutnumberPiglins(@NotNull TodePiglinMerchant todePiglinMerchant) {
@@ -294,9 +308,9 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
         return BrainUtils.hasMemory(todePiglinMerchant, MemoryModuleType.NEAREST_PLAYER_HOLDING_WANTED_ITEM);
     }
     public static boolean isWearingFriendlyGear(@NotNull Player player) {
-        for(ItemStack itemstack : player.getArmorSlots()) {
+        for (ItemStack itemstack : player.getArmorSlots()) {
             itemstack.getItem();
-            if (itemstack.makesPiglinsNeutral(player)) {
+            if (itemstack.getItem() instanceof ArmorItem && ((ArmorItem) itemstack.getItem()).getMaterial() == ArmorMaterials.GOLD) {
                 return true;
             }
         }
