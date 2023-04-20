@@ -14,11 +14,7 @@ import java.util.Map;
 
 import static net.warrentode.todepiglins.TodePiglins.MODID;
 
-/**
- * AUTHOR: MrCrayfish
- * <a href="https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X">https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X</a>
- * modified by me to fit my mod
- * **/
+// AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
 public class TodePiglinMerchantSavedData extends SavedData {
     private static final String DATA_NAME = MODID + "todepiglinmerchant";
 
@@ -31,20 +27,20 @@ public class TodePiglinMerchantSavedData extends SavedData {
     }
 
     public TodePiglinMerchantSavedData read(@NotNull CompoundTag tag) {
-        if (tag.contains("GoblinTraderSpawnDelay", Tag.TAG_INT)) {
-            this.getTodePiglinMerchantData("GoblinTrader").setTodePiglinMerchantSpawnDelay(tag.getInt("GoblinTraderSpawnDelay"));
+        if (tag.contains("PiglinMerchantSpawnDelay", Tag.TAG_INT)) {
+            this.getTodePiglinMerchantData("PiglinMerchant").setTodePiglinMerchantSpawnDelay(tag.getInt("PiglinMerchantSpawnDelay"));
         }
-        if (tag.contains("GoblinTraderSpawnChance", Tag.TAG_INT)) {
-            this.getTodePiglinMerchantData("GoblinTrader").setTodePiglinMerchantSpawnChance(tag.getInt("GoblinTraderSpawnChance"));
+        if (tag.contains("PiglinMerchantSpawnChance", Tag.TAG_INT)) {
+            this.getTodePiglinMerchantData("PiglinMerchant").setTodePiglinMerchantSpawnChance(tag.getInt("PiglinMerchantSpawnChance"));
         }
         if (tag.contains("Data", Tag.TAG_LIST)) {
             this.data.clear();
             ListTag list = tag.getList("Data", Tag.TAG_COMPOUND);
             list.forEach(nbt -> {
-                CompoundTag goblinTag = (CompoundTag) nbt;
-                String key = goblinTag.getString("Key");
+                CompoundTag todePiglinMerchantTag = (CompoundTag) nbt;
+                String key = todePiglinMerchantTag.getString("Key");
                 TodePiglinMerchantData data = new TodePiglinMerchantData(this);
-                data.read(goblinTag);
+                data.read(todePiglinMerchantTag);
                 this.data.put(key, data);
             });
         }
@@ -54,11 +50,11 @@ public class TodePiglinMerchantSavedData extends SavedData {
     @Override
     public @NotNull CompoundTag save(@NotNull CompoundTag compound) {
         ListTag list = new ListTag();
-        this.data.forEach((s, goblinData) -> {
-            CompoundTag goblinTag = new CompoundTag();
-            goblinData.write(goblinTag);
-            goblinTag.putString("Key", s);
-            list.add(goblinTag);
+        this.data.forEach((s, todePiglinMerchantData) -> {
+            CompoundTag todePiglinMerchantTag = new CompoundTag();
+            todePiglinMerchantData.write(todePiglinMerchantTag);
+            todePiglinMerchantTag.putString("Key", s);
+            list.add(todePiglinMerchantTag);
         });
         compound.put("Data", list);
         return compound;

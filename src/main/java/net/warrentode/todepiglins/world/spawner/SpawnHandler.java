@@ -18,11 +18,7 @@ import java.util.Map;
 
 import static net.warrentode.todepiglins.TodePiglins.MODID;
 
-/**
- * AUTHOR: MrCrayfish
- * <a href="https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X">https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X</a>
- * modified by me to fit my mod
- * **/
+// AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
 @Mod.EventBusSubscriber(modid = MODID)
 public class SpawnHandler {
     private static Map<ResourceLocation, TodePiglinMerchantSpawner> spawners = new HashMap<>();
@@ -30,7 +26,6 @@ public class SpawnHandler {
     @SubscribeEvent
     public static void onWorldLoad(@NotNull ServerStartingEvent event) {
         MinecraftServer server = event.getServer();
-        spawners.put(BuiltinDimensionTypes.OVERWORLD.location(), new TodePiglinMerchantSpawner(server, "TodePiglinMerchant", ModEntityTypes.TODEPIGLINMERCHANT.get(), Config.COMMON.todePiglinMerchant));
         spawners.put(BuiltinDimensionTypes.NETHER.location(), new TodePiglinMerchantSpawner(server, "TodePiglinMerchant", ModEntityTypes.TODEPIGLINMERCHANT.get(), Config.COMMON.todePiglinMerchant));
     }
 

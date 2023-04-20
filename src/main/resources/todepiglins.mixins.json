@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "net.warrentode.todepiglins.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "modid.refmap.json",
+  "mixins": [
+    "PiglinMerchantPortalSpawnRule"
+  ],
+  "client": [
+  ],
+  "minVersion": "0.8"
+}

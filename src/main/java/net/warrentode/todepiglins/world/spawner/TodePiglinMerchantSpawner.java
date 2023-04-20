@@ -19,19 +19,15 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-/**
- * AUTHOR: MrCrayfish
- * <a href="https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X">https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X</a>
- * modified by me to fit my mod
- * **/
+// AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
 public class TodePiglinMerchantSpawner {
     private final TodePiglinMerchantData data;
     private final EntityType<TodePiglinMerchant> entityType;
     private int delayBeforeSpawnLogic;
-    private final int traderSpawnDelay;
-    private final int traderSpawnChance;
-    private int currentTraderSpawnDelay;
-    private int currentTraderSpawnChance;
+    private final int todePiglinMerchantSpawnDelay;
+    private final int todePiglinMerchantSpawnChance;
+    private int currentTodePiglinMerchantSpawnDelay;
+    private int currentTodePiglinMerchantSpawnChance;
     private int minLevel;
     private int maxLevel;
 
@@ -40,37 +36,37 @@ public class TodePiglinMerchantSpawner {
         this.data = TodePiglinMerchantSavedData.get(server).getTodePiglinMerchantData(key);
         this.entityType = entityType;
         this.delayBeforeSpawnLogic = 600;
-        this.currentTraderSpawnDelay = this.data.getTodePiglinMerchantSpawnDelay();
-        this.currentTraderSpawnChance = this.data.getTodePiglinMerchantSpawnChance();
-        this.traderSpawnDelay = todePiglinMerchant.traderSpawnDelay.get();
-        this.traderSpawnChance = todePiglinMerchant.traderSpawnChance.get();
-        this.minLevel = Math.min(todePiglinMerchant.traderMinSpawnLevel.get(), todePiglinMerchant.traderMaxSpawnLevel.get());
-        this.maxLevel = Math.max(todePiglinMerchant.traderMinSpawnLevel.get(), todePiglinMerchant.traderMaxSpawnLevel.get());
-        if (this.currentTraderSpawnDelay == 0 && this.currentTraderSpawnChance == 0) {
-            this.currentTraderSpawnDelay = this.traderSpawnDelay;
-            this.currentTraderSpawnChance = this.traderSpawnChance;
-            this.data.setTodePiglinMerchantSpawnDelay(this.currentTraderSpawnDelay);
-            this.data.setTodePiglinMerchantSpawnChance(this.currentTraderSpawnChance);
+        this.currentTodePiglinMerchantSpawnDelay = this.data.getTodePiglinMerchantSpawnDelay();
+        this.currentTodePiglinMerchantSpawnChance = this.data.getTodePiglinMerchantSpawnChance();
+        this.todePiglinMerchantSpawnDelay = todePiglinMerchant.todePiglinMerchantSpawnDelay.get();
+        this.todePiglinMerchantSpawnChance = todePiglinMerchant.todePiglinMerchantSpawnChance.get();
+        this.minLevel = Math.min(todePiglinMerchant.todePiglinMerchantMinSpawnLevel.get(), todePiglinMerchant.todePiglinMerchantMaxSpawnLevel.get());
+        this.maxLevel = Math.max(todePiglinMerchant.todePiglinMerchantMinSpawnLevel.get(), todePiglinMerchant.todePiglinMerchantMaxSpawnLevel.get());
+        if (this.currentTodePiglinMerchantSpawnDelay == 0 && this.currentTodePiglinMerchantSpawnChance == 0) {
+            this.currentTodePiglinMerchantSpawnDelay = this.todePiglinMerchantSpawnDelay;
+            this.currentTodePiglinMerchantSpawnChance = this.todePiglinMerchantSpawnChance;
+            this.data.setTodePiglinMerchantSpawnDelay(this.currentTodePiglinMerchantSpawnDelay);
+            this.data.setTodePiglinMerchantSpawnChance(this.currentTodePiglinMerchantSpawnChance);
         }
     }
 
     public void tick(@NotNull Level level) {
         if (level.getGameRules().getBoolean(GameRules.RULE_DO_TRADER_SPAWNING)) {
             if (--this.delayBeforeSpawnLogic <= 0) {
-                int delay = Math.max(this.traderSpawnDelay / 20, 1);
+                int delay = Math.max(this.todePiglinMerchantSpawnDelay / 20, 1);
                 this.delayBeforeSpawnLogic = delay;
-                this.currentTraderSpawnDelay -= delay;
-                this.data.setTodePiglinMerchantSpawnDelay(this.currentTraderSpawnDelay);
-                if (this.currentTraderSpawnDelay <= 0) {
-                    this.currentTraderSpawnDelay = this.traderSpawnDelay;
+                this.currentTodePiglinMerchantSpawnDelay -= delay;
+                this.data.setTodePiglinMerchantSpawnDelay(this.currentTodePiglinMerchantSpawnDelay);
+                if (this.currentTodePiglinMerchantSpawnDelay <= 0) {
+                    this.currentTodePiglinMerchantSpawnDelay = this.todePiglinMerchantSpawnDelay;
                     if (level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) {
-                        int spawnChance = this.currentTraderSpawnChance;
-                        this.currentTraderSpawnChance = Mth.clamp(this.currentTraderSpawnChance + this.traderSpawnChance, this.traderSpawnChance, 100);
-                        this.data.setTodePiglinMerchantSpawnChance(this.currentTraderSpawnChance);
+                        int spawnChance = this.currentTodePiglinMerchantSpawnChance;
+                        this.currentTodePiglinMerchantSpawnChance = Mth.clamp(this.currentTodePiglinMerchantSpawnChance + this.todePiglinMerchantSpawnChance, this.todePiglinMerchantSpawnChance, 100);
+                        this.data.setTodePiglinMerchantSpawnChance(this.currentTodePiglinMerchantSpawnChance);
 
                         if (level.getRandom().nextInt(100) <= spawnChance) {
                             if (this.spawnTrader(level)) {
-                                this.currentTraderSpawnChance = this.traderSpawnChance;
+                                this.currentTodePiglinMerchantSpawnChance = this.todePiglinMerchantSpawnChance;
                             }
                         }
                     }
@@ -100,7 +96,7 @@ public class TodePiglinMerchantSpawner {
                 }
                 TodePiglinMerchant todePiglinMerchant = (TodePiglinMerchant) this.entityType.spawn((ServerLevel) randomPlayer.level, null, null, safestPos, MobSpawnType.EVENT, false, false);
                 if (todePiglinMerchant != null) {
-                    todePiglinMerchant.setDespawnDelay(this.traderSpawnDelay);
+                    todePiglinMerchant.setDespawnDelay(this.todePiglinMerchantSpawnDelay);
                     todePiglinMerchant.restrictTo(safestPos, 16);
                     return true;
                 }

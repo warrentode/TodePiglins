@@ -19,34 +19,34 @@ public final class Config {
         Common(@NotNull ForgeConfigSpec.Builder builder) {
             builder.comment("Common configuration settings").push("common");
             this.todePiglinMerchant = new TodePiglinMerchant(builder, "Piglin Merchant", "todepiglinmerchant", 25, 24000, -64, 50);
-            this.preventDespawnIfNamed = builder.comment("If true, prevents the trader from despawning if named").define("preventDespawnIfNamed", true);
+            this.preventDespawnIfNamed = builder.comment("If true, prevents the merchant from despawning if named").define("preventDespawnIfNamed", true);
             builder.pop();
         }
 
         public static class TodePiglinMerchant {
-            public final ForgeConfigSpec.IntValue traderSpawnChance;
-            public final ForgeConfigSpec.IntValue traderSpawnDelay;
-            public final ForgeConfigSpec.IntValue traderMinSpawnLevel;
-            public final ForgeConfigSpec.IntValue traderMaxSpawnLevel;
+            public final ForgeConfigSpec.IntValue todePiglinMerchantSpawnChance;
+            public final ForgeConfigSpec.IntValue todePiglinMerchantSpawnDelay;
+            public final ForgeConfigSpec.IntValue todePiglinMerchantMinSpawnLevel;
+            public final ForgeConfigSpec.IntValue todePiglinMerchantMaxSpawnLevel;
             public final ForgeConfigSpec.IntValue restockDelay;
             public final Trades trades;
 
             public TodePiglinMerchant(@NotNull ForgeConfigSpec.Builder builder, String name, String key, int spawnChance, int spawnDelay, int minLevel, int maxLevel) {
                 builder.comment(name + " settings").push(key);
-                this.traderSpawnChance = builder
-                        .comment("The chance out of one hundred that the trader will spawn in the over world")
+                this.todePiglinMerchantSpawnChance = builder
+                        .comment("The chance out of one hundred that the merchant will spawn")
                         .defineInRange("traderSpawnChance", spawnChance, 1, 100);
-                this.traderSpawnDelay = builder
-                        .comment("The amount of ticks before the trader will spawn again")
+                this.todePiglinMerchantSpawnDelay = builder
+                        .comment("The amount of ticks before the merchant will spawn again")
                         .defineInRange("traderSpawnDelay", spawnDelay, 0, Integer.MAX_VALUE);
-                this.traderMinSpawnLevel = builder
-                        .comment("The minimum level the trader can spawn")
+                this.todePiglinMerchantMinSpawnLevel = builder
+                        .comment("The minimum level the merchant can spawn")
                         .defineInRange("traderMinSpawnLevel", minLevel, -64, 320);
-                this.traderMaxSpawnLevel = builder
-                        .comment("The maximum level the trader can spawn")
+                this.todePiglinMerchantMaxSpawnLevel = builder
+                        .comment("The maximum level the merchant can spawn")
                         .defineInRange("traderMaxSpawnLevel", maxLevel, -64, 320);
                 this.restockDelay = builder
-                        .comment("The amount of ticks before the trader will replenish it's trades. Set to -1 to disable restocking")
+                        .comment("The amount of ticks before the merchant will replenish it's trades. Set to -1 to disable restocking")
                         .defineInRange("restockDelay", 48000, -1, Integer.MAX_VALUE);
                 this.trades = new Trades(builder);
                 builder.pop();

@@ -28,11 +28,7 @@ import java.util.stream.Stream;
 
 import static net.warrentode.todepiglins.TodePiglins.MODID;
 
-/**
- * AUTHOR: MrCrayfish
- * <a href="https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X">https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X</a>
- * modified by me to fit my mod
- * **/
+// AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
 public class BasicType implements ITradeType<TodePiglinMerchantTrade> {
     public static final Serializer SERIALIZER = new Serializer();
 

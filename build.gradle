@@ -1,9 +1,31 @@
 //file:noinspection GroovyAssignabilityCheck
+// TODO
+//  setup Mixin for vanilla Piglin barter system based on the Piglin Merchant's barter system
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
+    }
+}
+
 plugins {
     id 'eclipse'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '5.1.+'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.spongepowered.mixin'
+
+mixin {
+    add sourceSets.main, "todepiglins.refmap.json"
+
+    config "todepiglins.mixins.json"
 }
 
 version = '1.19.2-0.0.11'
@@ -91,6 +113,7 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.19.2-43.2.8'
     implementation fg.deobf("net.tslat.smartbrainlib:SmartBrainLib-forge-1.19.2:1.8.1")
     implementation fg.deobf('software.bernie.geckolib:geckolib-forge-1.19:3.1.40')
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 jar {

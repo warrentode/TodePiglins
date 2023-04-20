@@ -4,11 +4,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * AUTHOR: MrCrayfish
- * <a href="https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X">https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X</a>
- * modified by me to fit my mod
- * **/
+// AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
 public class TodePiglinMerchantData {
     private TodePiglinMerchantSavedData data;
     private int todePiglinMerchantSpawnDelay;
@@ -37,18 +33,18 @@ public class TodePiglinMerchantData {
     }
 
     public void read(@NotNull CompoundTag compound) {
-        if (compound.contains("GoblinTraderSpawnDelay", Tag.TAG_INT)) {
-            this.todePiglinMerchantSpawnDelay = compound.getInt("GoblinTraderSpawnDelay");
+        if (compound.contains("PiglinMerchantSpawnDelay", Tag.TAG_INT)) {
+            this.todePiglinMerchantSpawnDelay = compound.getInt("PiglinMerchantSpawnDelay");
         }
-        if (compound.contains("GoblinTraderSpawnChance", Tag.TAG_INT)) {
-            this.todePiglinMerchantSpawnChance = compound.getInt("GoblinTraderSpawnChance");
+        if (compound.contains("PiglinMerchantSpawnChance", Tag.TAG_INT)) {
+            this.todePiglinMerchantSpawnChance = compound.getInt("PiglinMerchantSpawnChance");
         }
     }
 
     @SuppressWarnings("UnusedReturnValue")
     public CompoundTag write(@NotNull CompoundTag compound) {
-        compound.putInt("GoblinTraderSpawnDelay", this.todePiglinMerchantSpawnDelay);
-        compound.putInt("GoblinTraderSpawnChance", this.todePiglinMerchantSpawnChance);
+        compound.putInt("PiglinMerchantSpawnDelay", this.todePiglinMerchantSpawnDelay);
+        compound.putInt("PiglinMerchantSpawnChance", this.todePiglinMerchantSpawnChance);
         return compound;
     }
 }

@@ -5,10 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.warrentode.todepiglins.trades.type.ITradeType;
 
-/**
- * AUTHOR: MrCrayfish
- * <a href="https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X">https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X</a>
- * **/
+// AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
 public abstract class TradeSerializer<T extends ITradeType<? extends VillagerTrades.ItemListing>> {
     private ResourceLocation id;
 

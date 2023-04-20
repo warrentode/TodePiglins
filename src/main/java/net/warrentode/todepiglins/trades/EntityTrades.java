@@ -12,10 +12,7 @@ import net.minecraft.world.entity.npc.VillagerTrades;
 
 import java.util.*;
 
-/**
- * AUTHOR: MrCrayfish
- * <a href="https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X">https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X</a>
- **/
+// AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
 public record EntityTrades(Map<TradeRarity, List<VillagerTrades.ItemListing>> tradeMap) {
     public EntityTrades(Map<TradeRarity, List<VillagerTrades.ItemListing>> tradeMap) {
         this.tradeMap = ImmutableMap.copyOf(tradeMap);

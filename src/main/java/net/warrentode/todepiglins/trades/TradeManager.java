@@ -28,10 +28,7 @@ import java.util.concurrent.Executor;
 
 import static net.warrentode.todepiglins.TodePiglins.MODID;
 
-/**
- * AUTHOR: MrCrayfish
- * <a href="https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X">https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X</a>
- * **/
+// AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
 @Mod.EventBusSubscriber(modid = MODID)
 public class TradeManager implements PreparableReloadListener {
     private static final int FILE_TYPE_LENGTH_VALUE = ".json".length();

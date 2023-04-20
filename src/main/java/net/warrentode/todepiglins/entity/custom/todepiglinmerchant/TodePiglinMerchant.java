@@ -331,7 +331,6 @@ public class TodePiglinMerchant extends PathfinderMob implements SmartBrainOwner
     }
 
     // inventory management
-    // TODO set up item handler capability for better inventory management? It's kind of a fucking mess...
     public final SimpleContainer inventory = new SimpleContainer(8);
     @Override
     @VisibleForDebug
@@ -398,8 +397,9 @@ public class TodePiglinMerchant extends PathfinderMob implements SmartBrainOwner
         pCompound.putInt("RestockDelay", this.restockDelay);
     }
 
-    // TODO consider bringing in Hoglin riding as your son requested
-    //  - at the very least make them useful in some way to the piglin merchant like the lamas are to the wandering trader
+    // TODO
+    //  consider bringing in Hoglin riding as your son requested?
+    //  - at the very least look into making them useful in some way to the piglin merchant like the llamas are to the wandering trader
     /** BRAIN BLOCK START **/
     @Override
     protected @NotNull Brain.Provider<?> brainProvider() {
@@ -1031,7 +1031,10 @@ public class TodePiglinMerchant extends PathfinderMob implements SmartBrainOwner
         }
         else {
             boolean flag2 = todePiglinMerchant.equipItemIfPossible(offHandItem);
-            if (!flag2) {
+            if (flag2) {
+                todePiglinMerchant.holdInMainHand(offHandItem);
+            }
+            else {
                 ItemStack mainHandItem = todePiglinMerchant.getMainHandItem();
                 if (isLovedItem(mainHandItem)) {
                     putInInventory(todePiglinMerchant, mainHandItem);
@@ -1039,8 +1042,6 @@ public class TodePiglinMerchant extends PathfinderMob implements SmartBrainOwner
                 else {
                     throwItems(todePiglinMerchant, Collections.singletonList(mainHandItem));
                 }
-
-                todePiglinMerchant.holdInMainHand(offHandItem);
             }
         }
     }

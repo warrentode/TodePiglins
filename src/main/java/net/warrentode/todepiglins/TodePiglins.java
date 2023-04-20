@@ -55,6 +55,7 @@ public class TodePiglins {
                     Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                     TodePiglinMerchant::checkTodePiglinMerchantSpawnRules);
         });
+        // AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
         TradeManager manager = TradeManager.instance();
         manager.registerTrader(ModEntityTypes.TODEPIGLINMERCHANT.get());
         manager.registerTypeSerializer(BasicType.SERIALIZER);

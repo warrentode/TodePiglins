@@ -5,11 +5,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.trading.MerchantOffers;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * AUTHOR: MrCrayfish
- * <a href="https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X">https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X</a>
- * modified by me to fit my mod
- * **/
+// AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
 public class TodePiglinMerchantOffers extends MerchantOffers {
     public TodePiglinMerchantOffers() {}
     public TodePiglinMerchantOffers(@NotNull CompoundTag compoundTag) {

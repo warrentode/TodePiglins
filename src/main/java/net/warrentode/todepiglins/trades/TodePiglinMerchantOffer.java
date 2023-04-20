@@ -11,11 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-/**
- * AUTHOR: MrCrayfish
- * <a href="https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X">https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X</a>
- * modified by me to fit my mod
- * **/
+// AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
 public class TodePiglinMerchantOffer extends MerchantOffer {
     public TodePiglinMerchantOffer(CompoundTag pCompoundTag) {
         super(pCompoundTag);
