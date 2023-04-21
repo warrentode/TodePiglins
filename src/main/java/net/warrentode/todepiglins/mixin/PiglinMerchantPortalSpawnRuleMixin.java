@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(NetherPortalBlock.class)
-public abstract class PiglinMerchantPortalSpawnRule {
+public abstract class PiglinMerchantPortalSpawnRuleMixin {
     Block pBlock = (Block) (Object) this;
 
     @Inject(at = @At("HEAD"), method = "randomTick")
