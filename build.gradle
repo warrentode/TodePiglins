@@ -28,7 +28,7 @@ mixin {
     config "todepiglins.mixins.json"
 }
 
-version = '1.19.2-0.0.13'
+version = '1.19.2-0.0.14'
 group = 'net.warrentode.todepiglins'
 archivesBaseName = 'todepiglins'
 
