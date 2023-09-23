@@ -1,0 +1,28 @@
+package com.github.warrentode.todepiglins.entity.custom.brain;
+
+import com.github.warrentode.todepiglins.entity.custom.brain.sensors.NearestWantedItemSensor;
+import com.github.warrentode.todepiglins.entity.custom.brain.sensors.TodePiglinBarterCurrencySensor;
+import com.github.warrentode.todepiglins.entity.custom.brain.sensors.TodePiglinSpecificSensor;
+import com.github.warrentode.todepiglins.entity.custom.todepiglinmerchant.TodePiglinMerchant;
+import net.minecraft.world.entity.ai.sensing.SensorType;
+import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Supplier;
+
+public class ModSensorTypes {
+    @SuppressWarnings("EmptyMethod")
+    public static void init() {}
+
+    public static final Supplier<SensorType<NearestWantedItemSensor<?>>> NEAREST_WANTED_ITEM_SENSOR
+            = register("nearest_wanted_item_sensor", NearestWantedItemSensor::new);
+    public static final Supplier<SensorType<TodePiglinSpecificSensor<?>>> TODEPIGLIN_SPECIFIC
+            = register("todepiglin_specific_sensor", TodePiglinSpecificSensor::new);
+
+    public static final Supplier<SensorType<TodePiglinBarterCurrencySensor<?>>> TODEPIGLIN_BARTER_CURRENCY
+            = register("todepiglin_barter_currency_sensor", ()-> new TodePiglinBarterCurrencySensor<>(TodePiglinMerchant.getBarterItems()));
+
+    private static <T extends ExtendedSensor<?>> @NotNull Supplier<SensorType<T>> register(String id, Supplier<T> sensor) {
+        return BrainLoader.registerSensorType(id, sensor);
+    }
+}
