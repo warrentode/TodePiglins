@@ -6,6 +6,7 @@ buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net/' }
         maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        maven { url = 'https://jitpack.io' }
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
@@ -30,7 +31,7 @@ mixin {
 
 version = "${project.minecraft_version}-${project.mod_version}"
 group = "${project.mod_domain}"
-archivesBaseName = 'todepiglins'
+archivesBaseName = "${project.modid}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
@@ -111,12 +112,19 @@ repositories {
     maven {
         url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
     }
+    maven { url = 'https://jitpack.io' }
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.2-43.2.8'
-    implementation fg.deobf("net.tslat.smartbrainlib:SmartBrainLib-forge-1.19.2:1.8.1")
-    implementation fg.deobf('software.bernie.geckolib:geckolib-forge-1.19:3.1.40')
+    minecraft 'net.minecraftforge:forge:1.19.2-43.3.0'
+
+    // addresses vulnerabilities in netty and logging
+    implementation 'io.netty:netty-codec:4.1.86.Final'
+    implementation 'org.apache.logging.log4j:log4j-core:2.17.1'
+
+    implementation fg.deobf("curse.maven:smartbrainlib-661293:4458565")
+    implementation fg.deobf("curse.maven:geckolib-388172:4407241")
+
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
@@ -166,8 +174,8 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId = "${project.mod_domain}"
-            artifactId = "${project.modid}"
-            version = "${project.jar.archiveVersion}"
+            artifactId = "${project.name}"
+            version = "${project.minecraft_version}-${project.mod_version}"
 
             from components.java
         }
