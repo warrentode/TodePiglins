@@ -166,7 +166,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId = "${project.mod_domain}"
-            artifactId = "${project.mod_author}"
+            artifactId = "${project.modid}"
             version = "${project.jar.archiveVersion}"
 
             from components.java
