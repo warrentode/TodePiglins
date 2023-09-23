@@ -1,0 +1,5 @@
+// 1.19.2	2023-09-23T00:43:16.3353606	Tags for minecraft:item
+3e34e061ef021a96026d83f46d424f1d1b454c91 data/forge/tags/items/piglin_barter_items.json
+a16f72a4607d1c3be0ec3c707d553bbe53a04c3b data/forge/tags/items/piglin_wanted_items.json
+f5f7914ac4fd854c1a22cc49e134862148bae7a1 data/minecraft/tags/items/piglin_food.json
+506232cfd089e441f7bc686fcdb3ac4bbcecede1 data/minecraft/tags/items/piglin_loved.json

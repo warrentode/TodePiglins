@@ -21,6 +21,7 @@ import static com.github.warrentode.todepiglins.TodePiglins.MODID;
 // AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
 @Mod.EventBusSubscriber(modid = MODID)
 public class SpawnHandler {
+    @SuppressWarnings("CanBeFinal")
     private static Map<ResourceLocation, TodePiglinMerchantSpawner> spawners = new HashMap<>();
 
     @SubscribeEvent

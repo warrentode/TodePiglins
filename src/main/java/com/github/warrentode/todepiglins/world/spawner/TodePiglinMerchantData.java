@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 // AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
 public class TodePiglinMerchantData {
+    @SuppressWarnings("CanBeFinal")
     private TodePiglinMerchantSavedData data;
     private int todePiglinMerchantSpawnDelay;
     private int todePiglinMerchantSpawnChance;

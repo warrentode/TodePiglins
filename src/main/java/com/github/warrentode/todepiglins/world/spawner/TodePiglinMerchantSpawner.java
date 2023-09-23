@@ -28,7 +28,9 @@ public class TodePiglinMerchantSpawner {
     private final int todePiglinMerchantSpawnChance;
     private int currentTodePiglinMerchantSpawnDelay;
     private int currentTodePiglinMerchantSpawnChance;
+    @SuppressWarnings("CanBeFinal")
     private int minLevel;
+    @SuppressWarnings("CanBeFinal")
     private int maxLevel;
 
     public TodePiglinMerchantSpawner(MinecraftServer server, String key, EntityType<TodePiglinMerchant> entityType, @NotNull Config.Common.TodePiglinMerchant todePiglinMerchant){

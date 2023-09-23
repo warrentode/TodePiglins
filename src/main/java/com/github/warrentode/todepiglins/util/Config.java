@@ -18,7 +18,7 @@ public final class Config {
 
         Common(@NotNull ForgeConfigSpec.Builder builder) {
             builder.comment("Common configuration settings").push("common");
-            this.todePiglinMerchant = new TodePiglinMerchant(builder, "Piglin Merchant", "todepiglinmerchant", 25, 24000, -64, 50);
+            this.todePiglinMerchant = new TodePiglinMerchant(builder, "Piglin Merchant", "todepiglinmerchant", 25, 48000, -64, 50);
             this.preventDespawnIfNamed = builder.comment("If true, prevents the merchant from despawning if named").define("preventDespawnIfNamed", true);
             builder.pop();
         }

@@ -64,7 +64,7 @@ public class BasicType implements ITradeType<TodePiglinMerchantTrade> {
                 }
             }
         }
-        if (this.mobEffects.size() > 0) {
+        if (!this.mobEffects.isEmpty()) {
             PotionUtils.setCustomEffects(offerStack, this.mobEffects);
         }
         return new TodePiglinMerchantTrade(offerStack, this.paymentStack.copy(), this.secondaryPaymentStack.copy(), this.maxTrades, this.experience, this.priceMultiplier);
@@ -135,7 +135,7 @@ public class BasicType implements ITradeType<TodePiglinMerchantTrade> {
                 }
                 object.add("enchantments", enchantmentArray);
             }
-            if (trade.mobEffects.size() > 0) {
+            if (!trade.mobEffects.isEmpty()) {
                 JsonArray effectArray = new JsonArray();
                 for (MobEffectInstance effect : trade.mobEffects) {
                     effectArray.add(this.serializePotionEffect(effect));
@@ -209,7 +209,9 @@ public class BasicType implements ITradeType<TodePiglinMerchantTrade> {
         private float priceMultiplier = 0.0F;
         private int maxTrades = 12;
         private int experience = 10;
+        @SuppressWarnings("CanBeFinal")
         private List<EnchantmentInstance> enchantments = new ArrayList<>();
+        @SuppressWarnings("CanBeFinal")
         private List<MobEffectInstance> modEffects = new ArrayList<>();
 
         private Builder() {

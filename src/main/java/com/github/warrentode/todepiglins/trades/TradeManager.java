@@ -42,8 +42,10 @@ public class TradeManager implements PreparableReloadListener {
         return instance;
     }
 
+    @SuppressWarnings("CanBeFinal")
     private List<EntityType<?>> traders = new ArrayList<>();
     private Map<EntityType<?>, EntityTrades> tradeMap = new HashMap<>();
+    @SuppressWarnings("CanBeFinal")
     private Map<ResourceLocation, TradeSerializer<?>> tradeSerializer = new HashMap<>();
 
     @SubscribeEvent
@@ -114,6 +116,7 @@ public class TradeManager implements PreparableReloadListener {
                     builder.deserialize(rarity, object);
                 }
                 catch (IOException exception) {
+                    //noinspection CallToPrintStackTrace
                     exception.printStackTrace();
                 }
             });

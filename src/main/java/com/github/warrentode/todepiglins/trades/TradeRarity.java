@@ -11,6 +11,7 @@ public enum TradeRarity {
     private final String key;
     private final boolean shuffle;
 
+    @SuppressWarnings("SameParameterValue")
     TradeRarity(String key, boolean shuffle) {
         this.key = key;
         this.shuffle = shuffle;

@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(NetherPortalBlock.class)
 public abstract class PiglinMerchantPortalSpawnRuleMixin {
+    @SuppressWarnings("CanBeFinal")
     @Unique
     Block todePiglins$pBlock = (Block) (Object) this;
 

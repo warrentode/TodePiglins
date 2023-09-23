@@ -333,6 +333,7 @@ public class TodePiglinSpecificSensor<E extends LivingEntity> extends ExtendedSe
             return false;
         }
     }
+    @SuppressWarnings("SameReturnValue")
     public static @Nullable Player getNearestVisibleTargetablePlayer(@NotNull TodePiglinMerchant todePiglinMerchant) {
         if (todePiglinMerchant.getBrain().getMemory(MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER).isPresent()) {
             todePiglinMerchant.getBrain().hasMemoryValue(MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER);

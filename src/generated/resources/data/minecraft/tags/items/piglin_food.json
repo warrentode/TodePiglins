@@ -1,0 +1,52 @@
+{
+  "values": [
+    {
+      "id": "#fastfooddelight:pork_sandwich",
+      "required": false
+    },
+    {
+      "id": "#farmersdelight:honey_glazed_ham",
+      "required": false
+    },
+    {
+      "id": "#farmersdelight:bacon_sandwich",
+      "required": false
+    },
+    {
+      "id": "#farmersdelight:bacon",
+      "required": false
+    },
+    {
+      "id": "#farmersdelight:smoked_ham",
+      "required": false
+    },
+    {
+      "id": "#farmersdelight:ham",
+      "required": false
+    },
+    {
+      "id": "#nethersdelight:hoglin_ear",
+      "required": false
+    },
+    {
+      "id": "#nethersdelight:hoglin_sirloin",
+      "required": false
+    },
+    {
+      "id": "#nethersdelight:hoglin_loin",
+      "required": false
+    },
+    {
+      "id": "#nethersdelight:plate_of_stuffed_hoglin_roast",
+      "required": false
+    },
+    {
+      "id": "#nethersdelight:plate_of_stuffed_hoglin_ham",
+      "required": false
+    },
+    {
+      "id": "#nethersdelight:plate_of_stuffed_hoglin_snout",
+      "required": false
+    }
+  ]
+}

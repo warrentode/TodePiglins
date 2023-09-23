@@ -238,6 +238,7 @@ public class TodePiglinMerchant extends PathfinderMob implements SmartBrainOwner
     public boolean isAdult() {
         return !this.isBaby();
     }
+    @SuppressWarnings("SameReturnValue")
     public boolean isPreventingPlayerRest(@NotNull Player pPlayer) {
         return false;
     }
@@ -720,6 +721,7 @@ public class TodePiglinMerchant extends PathfinderMob implements SmartBrainOwner
         }
     }
 
+    @SuppressWarnings("SameReturnValue")
     private PlayState defaultPredicate(@NotNull AnimationEvent<TodePiglinMerchant> event) {
         if (event.isMoving()) {
             if (this.swinging) {
@@ -734,6 +736,7 @@ public class TodePiglinMerchant extends PathfinderMob implements SmartBrainOwner
         }
         return PlayState.CONTINUE;
     }
+    @SuppressWarnings("SameReturnValue")
     private PlayState admirePredicate(AnimationEvent<TodePiglinMerchant> event) {
         // it's the opposite hand moving here since the main hand goes to the handedness of the entity
         if (this.swinging && getArmPose() == TodePiglinMerchantArmPose.ACCEPT_ITEM
@@ -777,6 +780,7 @@ public class TodePiglinMerchant extends PathfinderMob implements SmartBrainOwner
         }
         return PlayState.CONTINUE;
     }
+    @SuppressWarnings("SameReturnValue")
     private PlayState dancePredicate(AnimationEvent<TodePiglinMerchant> event) {
         if (this.swinging && getArmPose() == TodePiglinMerchantArmPose.DANCING &&
                 event.getController().getAnimationState().equals(AnimationState.Stopped)) {
@@ -785,6 +789,7 @@ public class TodePiglinMerchant extends PathfinderMob implements SmartBrainOwner
         }
         return PlayState.CONTINUE;
     }
+    @SuppressWarnings("SameReturnValue")
     private PlayState meleePredicate(AnimationEvent<TodePiglinMerchant> event) {
         if (getArmPose() == TodePiglinMerchantArmPose.ATTACKING_WITH_MELEE_WEAPON) {
             if (this.swinging && event.getController().getAnimationState().equals(AnimationState.Stopped)) {
@@ -1218,6 +1223,7 @@ public class TodePiglinMerchant extends PathfinderMob implements SmartBrainOwner
     protected int getMaxRestockDelay() {
         return Config.COMMON.todePiglinMerchant.restockDelay.get();
     }
+    @SuppressWarnings("EmptyMethod")
     @Override
     public @NotNull Level getLevel() {
         return super.getLevel();

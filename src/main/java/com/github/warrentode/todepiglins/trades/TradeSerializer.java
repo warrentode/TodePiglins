@@ -7,6 +7,7 @@ import net.minecraft.world.entity.npc.VillagerTrades;
 
 // AUTHOR: MrCrayfish https://github.com/MrCrayfish/GoblinTraders/tree/1.19.X
 public abstract class TradeSerializer<T extends ITradeType<? extends VillagerTrades.ItemListing>> {
+    @SuppressWarnings("CanBeFinal")
     private ResourceLocation id;
 
     public TradeSerializer(ResourceLocation id) {
