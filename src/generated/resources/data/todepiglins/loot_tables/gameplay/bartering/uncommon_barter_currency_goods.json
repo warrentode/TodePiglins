@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:barter",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "name": "todepiglins:gameplay/bartering/uncommon_barter_goods",
+          "weight": 30
+        },
+        {
+          "type": "minecraft:loot_table",
+          "name": "todepiglins:gameplay/bartering/rare_barter_currency_goods"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}

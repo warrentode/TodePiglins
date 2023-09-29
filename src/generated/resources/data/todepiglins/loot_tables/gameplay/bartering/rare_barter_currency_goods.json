@@ -1,0 +1,152 @@
+{
+  "type": "minecraft:barter",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:tag",
+          "expand": true,
+          "name": "todepiglins:piglin_merchant_rare_goods"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "enchantments": [
+                "minecraft:mending",
+                "minecraft:fire_protection",
+                "minecraft:soul_speed",
+                "minecraft:quick_charge",
+                "minecraft:blast_protection",
+                "minecraft:fortune",
+                "minecraft:smite",
+                "minecraft:thorns",
+                "minecraft:looting"
+              ],
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "minecraft:book"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "enchantments": [
+                "minecraft:mending",
+                "minecraft:smite",
+                "minecraft:looting"
+              ],
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "minecraft:netherite_sword"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "enchantments": [
+                "minecraft:mending",
+                "minecraft:fortune",
+                "minecraft:smite",
+                "minecraft:looting"
+              ],
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "minecraft:netherite_axe"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "enchantments": [
+                "minecraft:mending",
+                "minecraft:fortune"
+              ],
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "minecraft:netherite_pickaxe"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "enchantments": [
+                "minecraft:mending",
+                "minecraft:quick_charge"
+              ],
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "minecraft:crossbow"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "enchantments": [
+                "minecraft:mending",
+                "minecraft:fire_protection",
+                "minecraft:blast_protection",
+                "minecraft:thorns"
+              ],
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "minecraft:netherite_helmet"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "enchantments": [
+                "minecraft:mending",
+                "minecraft:fire_protection",
+                "minecraft:blast_protection",
+                "minecraft:thorns"
+              ],
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "minecraft:netherite_chestplate"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "enchantments": [
+                "minecraft:mending",
+                "minecraft:fire_protection",
+                "minecraft:blast_protection",
+                "minecraft:thorns"
+              ],
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "minecraft:netherite_leggings"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "enchantments": [
+                "minecraft:mending",
+                "minecraft:fire_protection",
+                "minecraft:soul_speed",
+                "minecraft:blast_protection",
+                "minecraft:thorns"
+              ],
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "minecraft:netherite_boots"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}

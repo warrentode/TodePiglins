@@ -1,5 +1,6 @@
 package com.github.warrentode.todepiglins.datagen;
 
+import com.github.warrentode.todepiglins.datagen.providers.ModLootTableGenProvider;
 import com.github.warrentode.todepiglins.datagen.tags.BlockTagsGen;
 import com.github.warrentode.todepiglins.datagen.tags.ItemsTagGen;
 import net.minecraft.data.DataGenerator;
@@ -23,5 +24,7 @@ public class ModGenerators {
 
         ItemsTagGen itemTagsGen = new ItemsTagGen(generator, blockTagsGen, MODID, helper);
         generator.addProvider(event.includeServer(), itemTagsGen);
+
+        generator.addProvider(event.includeServer(), new ModLootTableGenProvider(generator));
     }
 }

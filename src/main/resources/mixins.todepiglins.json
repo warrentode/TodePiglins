@@ -2,7 +2,7 @@
   "required": true,
   "package": "com.github.warrentode.todepiglins.mixin",
   "compatibilityLevel": "JAVA_17",
-  "refmap": "todepiglins.refmap.json",
+  "refmap": "mixins.todepiglins.refmap.json",
   "mixins": [
     "PiglinBarterCurrencyMixin",
     "PiglinMerchantPortalSpawnRuleMixin"

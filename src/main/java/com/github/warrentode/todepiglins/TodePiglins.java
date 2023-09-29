@@ -28,7 +28,6 @@ import org.jetbrains.annotations.NotNull;
 
 @Mod(TodePiglins.MODID)
 public class TodePiglins {
-    @SuppressWarnings("unused")
     public static final Logger LOGGER = LogManager.getLogger(TodePiglins.class);
     public static final String MODID = "todepiglins";
 

@@ -1,6 +1,8 @@
 {
   "values": [
-    "minecraft:gold_ingot",
+    "#forge:piglin_barter_items/common_barter_currency",
+    "#forge:piglin_barter_items/uncommon_barter_currency",
+    "#forge:piglin_barter_items/rare_barter_currency",
     {
       "id": "todecoins:nether_gold_coin",
       "required": false
